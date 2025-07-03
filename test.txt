@@ -1,21 +1,44 @@
 savindu@savindu-Katana-GF66-11SC:~/LiDAR_Interface/slam_lidar_cpp/build$ make -j4
 [ 12%] Building CXX object CMakeFiles/lidar_reader.dir/src/lidar_reader.cpp.o
 [ 25%] Building CXX object CMakeFiles/read_packets.dir/src/read_packets.cpp.o
-/home/savindu/LiDAR_Interface/slam_lidar_cpp/src/lidar_reader.cpp: In member function ‘std::vector<ScanPoint> LiDARReader::readScan()’:
-/home/savindu/LiDAR_Interface/slam_lidar_cpp/src/lidar_reader.cpp:90:8: error: ‘array’ is not a member of ‘std’
-   90 |   std::array<decltype(packet.BlockID[0]), BLOCKS_PER_SCAN> blocks;
-      |        ^~~~~
-/home/savindu/LiDAR_Interface/slam_lidar_cpp/src/lidar_reader.cpp:14:1: note: ‘std::array’ is defined in header ‘<array>’; did you forget to ‘#include <array>’?
-   13 | #include <cmath>
-  +++ |+#include <array>
-   14 | 
-/home/savindu/LiDAR_Interface/slam_lidar_cpp/src/lidar_reader.cpp:90:14: error: expected primary-expression before ‘decltype’
-   90 |   std::array<decltype(packet.BlockID[0]), BLOCKS_PER_SCAN> blocks;
-      |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/savindu/LiDAR_Interface/slam_lidar_cpp/src/lidar_reader.cpp:91:3: error: ‘blocks’ was not declared in this scope; did you mean ‘lockf’?
-   91 |   blocks[0] = b0;
-      |   ^~~~~~
-      |   lockf
+In file included from /home/savindu/LiDAR_Interface/slam_lidar_cpp/src/lidar_reader.cpp:14:
+/usr/include/c++/11/array: In instantiation of ‘struct std::array<Data_block&, 12>’:
+/home/savindu/LiDAR_Interface/slam_lidar_cpp/src/lidar_reader.cpp:91:60:   required from here
+/usr/include/c++/11/array:98:55: error: forming pointer to reference type ‘std::array<Data_block&, 12>::value_type’ {aka ‘Data_block&’}
+   98 |       typedef value_type*                             pointer;
+      |                                                       ^~~~~~~
+/usr/include/c++/11/array:99:55: error: forming pointer to reference type ‘std::array<Data_block&, 12>::value_type’ {aka ‘Data_block&’}
+   99 |       typedef const value_type*                       const_pointer;
+      |                                                       ^~~~~~~~~~~~~
+/usr/include/c++/11/array:102:55: error: forming pointer to reference type ‘std::array<Data_block&, 12>::value_type’ {aka ‘Data_block&’}
+  102 |       typedef value_type*                             iterator;
+      |                                                       ^~~~~~~~
+/usr/include/c++/11/array:103:55: error: forming pointer to reference type ‘std::array<Data_block&, 12>::value_type’ {aka ‘Data_block&’}
+  103 |       typedef const value_type*                       const_iterator;
+      |                                                       ^~~~~~~~~~~~~~
+/usr/include/c++/11/array:106:55: error: forming pointer to reference type ‘Data_block&’
+  106 |       typedef std::reverse_iterator<iterator>         reverse_iterator;
+      |                                                       ^~~~~~~~~~~~~~~~
+/usr/include/c++/11/array:107:55: error: forming pointer to reference type ‘Data_block&’
+  107 |       typedef std::reverse_iterator<const_iterator>   const_reverse_iterator;
+      |                                                       ^~~~~~~~~~~~~~~~~~~~~~
+/usr/include/c++/11/array: In instantiation of ‘struct std::__array_traits<Data_block&, 12>’:
+/usr/include/c++/11/array:111:56:   required from ‘struct std::array<Data_block&, 12>’
+/home/savindu/LiDAR_Interface/slam_lidar_cpp/src/lidar_reader.cpp:91:60:   required from here
+/usr/include/c++/11/array:51:19: error: creating array of ‘Data_block&’
+   51 |       typedef _Tp _Type[_Nm];
+      |                   ^~~~~
+/usr/include/c++/11/array:60:7: error: forming pointer to reference type ‘Data_block&’
+   60 |       _S_ptr(const _Type& __t) noexcept
+      |       ^~~~~~
+/usr/include/c++/11/array: In instantiation of ‘constexpr std::array<_Tp, _Nm>::value_type& std::array<_Tp, _Nm>::operator[](std::array<_Tp, _Nm>::size_type) [with _Tp = Data_block&; long unsigned int _Nm = 12; std::array<_Tp, _Nm>::reference = Data_block&; std::array<_Tp, _Nm>::size_type = long unsigned int]’:
+/home/savindu/LiDAR_Interface/slam_lidar_cpp/src/lidar_reader.cpp:92:11:   required from here
+/usr/include/c++/11/array:189:32: error: ‘_S_ref’ is not a member of ‘std::array<Data_block&, 12>::_AT_Type’
+  189 |         return _AT_Type::_S_ref(_M_elems, __n);
+      |                ~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~
+/usr/include/c++/11/array:189:33: error: using invalid field ‘std::array<_Tp, _Nm>::_M_elems’
+  189 |         return _AT_Type::_S_ref(_M_elems, __n);
+      |                                 ^~~~~~~~
 make[2]: *** [CMakeFiles/lidar_reader.dir/build.make:76: CMakeFiles/lidar_reader.dir/src/lidar_reader.cpp.o] Error 1
 make[1]: *** [CMakeFiles/Makefile2:89: CMakeFiles/lidar_reader.dir/all] Error 2
 make[1]: *** Waiting for unfinished jobs....
