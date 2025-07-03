@@ -16,26 +16,25 @@
 static constexpr double M_PI = 3.14159265358979323846;
 #endif
 
-static constexpr int   BLOCKS_PER_SCAN  = 12;
-static constexpr int   POINTS_PER_BLOCK = 16;
-static constexpr double INF_DIST        = std::numeric_limits<double>::infinity();
+static constexpr int   BLOCKS_PER_SCAN   = 12;
+static constexpr int   POINTS_PER_BLOCK  = 16;
+static constexpr double INF_DIST         = std::numeric_limits<double>::infinity();
 
-LiDARReader::LiDARReader(const std::string& host_ip,
+LiDARReader::LiDARReader(const std::string& /*host_ip*/,
                          int port,
                          int angle_offset,
                          bool inverted)
   : angle_offset_(angle_offset),
     inverted_(inverted)
 {
-  setupSocket(host_ip, port);
+  setupSocket(port);
 }
 
 LiDARReader::~LiDARReader() {
   if (sockfd_ >= 0) close(sockfd_);
 }
 
-// We ignore host_ip here because we bind to INADDR_ANY
-void LiDARReader::setupSocket(const std::string& /*host_ip*/, int port) {
+void LiDARReader::setupSocket(int port) {
   sockfd_ = socket(AF_INET, SOCK_DGRAM, 0);
   if (sockfd_ < 0)
     throw std::runtime_error("socket() failed");
@@ -68,31 +67,32 @@ std::vector<ScanPoint> LiDARReader::readScan() {
 
   // --- Read first two blocks to compute angular step ---
   recvPacket(packet);
-  auto &b0 = packet.BlockID[0];
+  Data_block b0 = packet.BlockID[0];
   b0.DataFlag = ntohs(b0.DataFlag);
   b0.Azimuth  = ntohs(b0.Azimuth);
   for (int i = 0; i < POINTS_PER_BLOCK; ++i)
     b0.Result[i].Dist_1 = ntohs(b0.Result[i].Dist_1);
 
   recvPacket(packet);
-  auto &b1 = packet.BlockID[1];
+  Data_block b1 = packet.BlockID[1];
   b1.DataFlag = ntohs(b1.DataFlag);
   b1.Azimuth  = ntohs(b1.Azimuth);
   for (int i = 0; i < POINTS_PER_BLOCK; ++i)
     b1.Result[i].Dist_1 = ntohs(b1.Result[i].Dist_1);
 
+  // Compute per-beam step (in degrees)
   // Azimuth fields are in hundredths of a degree
   double az0_deg = b0.Azimuth / 100.0;
   double az1_deg = b1.Azimuth / 100.0;
   double step_deg = (az1_deg - az0_deg) / POINTS_PER_BLOCK;
 
-  // Store these two blocks plus the next 10 into an array
-  std::array<decltype(packet.BlockID[0]), BLOCKS_PER_SCAN> blocks;
+  // --- Collect all 12 blocks into a simple C-array ---
+  Data_block blocks[BLOCKS_PER_SCAN];
   blocks[0] = b0;
   blocks[1] = b1;
   for (int b = 2; b < BLOCKS_PER_SCAN; ++b) {
     recvPacket(packet);
-    auto &blk = packet.BlockID[b];
+    Data_block &blk = packet.BlockID[b];
     blk.DataFlag = ntohs(blk.DataFlag);
     blk.Azimuth  = ntohs(blk.Azimuth);
     for (int i = 0; i < POINTS_PER_BLOCK; ++i)
@@ -102,7 +102,7 @@ std::vector<ScanPoint> LiDARReader::readScan() {
 
   // --- Convert each block's 16 points into ScanPoint entries ---
   for (int b = 0; b < BLOCKS_PER_SCAN; ++b) {
-    const auto &blk = blocks[b];
+    const Data_block &blk = blocks[b];
     double base_deg = blk.Azimuth / 100.0 + angle_offset_;
 
     for (int i = 0; i < POINTS_PER_BLOCK; ++i) {
