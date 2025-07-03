@@ -1,285 +1,440 @@
 Listening on port 2368...
- First 4 bytes: ff ee 0 0
  Azimuth: 0°
-  🔹 Point 0: Distance = 0 m, RSSI = 0
-  🔹 Point 1: Distance = 0 m, RSSI = 0
-  🔹 Point 2: Distance = 0 m, RSSI = 0
-  🔹 Point 3: Distance = 0 m, RSSI = 0
-  🔹 Point 4: Distance = 0 m, RSSI = 0
-  🔹 Point 5: Distance = 0 m, RSSI = 0
-  🔹 Point 6: Distance = 0 m, RSSI = 0
-  🔹 Point 7: Distance = 0 m, RSSI = 0
-  🔹 Point 8: Distance = 0 m, RSSI = 0
-  🔹 Point 9: Distance = 0 m, RSSI = 0
-  🔹 Point 10: Distance = 0 m, RSSI = 0
-  🔹 Point 11: Distance = 0 m, RSSI = 0
-  🔹 Point 12: Distance = 0 m, RSSI = 0
-  🔹 Point 13: Distance = 0 m, RSSI = 0
-  🔹 Point 14: Distance = 0 m, RSSI = 0
-  🔹 Point 15: Distance = 0 m, RSSI = 0
 ----------------------------------
- First 4 bytes: ff ee 80 7
  Azimuth: 327.75°
-  🔹 Point 0: Distance = 0 m, RSSI = 0
-  🔹 Point 1: Distance = 0 m, RSSI = 0
-  🔹 Point 2: Distance = 0 m, RSSI = 0
-  🔹 Point 3: Distance = 0 m, RSSI = 0
-  🔹 Point 4: Distance = 0 m, RSSI = 0
-  🔹 Point 5: Distance = 0 m, RSSI = 0
-  🔹 Point 6: Distance = 0 m, RSSI = 0
-  🔹 Point 7: Distance = 0 m, RSSI = 0
-  🔹 Point 8: Distance = 0 m, RSSI = 0
-  🔹 Point 9: Distance = 0 m, RSSI = 0
-  🔹 Point 10: Distance = 0 m, RSSI = 0
-  🔹 Point 11: Distance = 0 m, RSSI = 0
-  🔹 Point 12: Distance = 0 m, RSSI = 0
-  🔹 Point 13: Distance = 0 m, RSSI = 0
-  🔹 Point 14: Distance = 0 m, RSSI = 0
-  🔹 Point 15: Distance = 0 m, RSSI = 0
 ----------------------------------
- First 4 bytes: ff ee 0 f
  Azimuth: 0.15°
-  🔹 Point 0: Distance = 0 m, RSSI = 0
-  🔹 Point 1: Distance = 0 m, RSSI = 0
-  🔹 Point 2: Distance = 0 m, RSSI = 0
-  🔹 Point 3: Distance = 0 m, RSSI = 0
-  🔹 Point 4: Distance = 0 m, RSSI = 0
-  🔹 Point 5: Distance = 0 m, RSSI = 0
-  🔹 Point 6: Distance = 0 m, RSSI = 0
-  🔹 Point 7: Distance = 0 m, RSSI = 0
-  🔹 Point 8: Distance = 0 m, RSSI = 0
-  🔹 Point 9: Distance = 0 m, RSSI = 0
-  🔹 Point 10: Distance = 0 m, RSSI = 0
-  🔹 Point 11: Distance = 0 m, RSSI = 0
-  🔹 Point 12: Distance = 0 m, RSSI = 0
-  🔹 Point 13: Distance = 0 m, RSSI = 0
-  🔹 Point 14: Distance = 0 m, RSSI = 0
-  🔹 Point 15: Distance = 0 m, RSSI = 0
 ----------------------------------
- First 4 bytes: ff ee 80 16
  Azimuth: 327.9°
-  🔹 Point 0: Distance = 0 m, RSSI = 0
-  🔹 Point 1: Distance = 253.45 m, RSSI = 141
-  🔹 Point 2: Distance = 0 m, RSSI = 0
-  🔹 Point 3: Distance = 253.45 m, RSSI = 142
-  🔹 Point 4: Distance = 0 m, RSSI = 0
-  🔹 Point 5: Distance = 245.77 m, RSSI = 144
-  🔹 Point 6: Distance = 0 m, RSSI = 0
-  🔹 Point 7: Distance = 243.21 m, RSSI = 143
-  🔹 Point 8: Distance = 0 m, RSSI = 0
-  🔹 Point 9: Distance = 243.21 m, RSSI = 143
-  🔹 Point 10: Distance = 0 m, RSSI = 0
-  🔹 Point 11: Distance = 245.77 m, RSSI = 143
-  🔹 Point 12: Distance = 0 m, RSSI = 0
-  🔹 Point 13: Distance = 256.01 m, RSSI = 140
-  🔹 Point 14: Distance = 0 m, RSSI = 0
-  🔹 Point 15: Distance = 266.25 m, RSSI = 142
 ----------------------------------
- First 4 bytes: ff ee 0 1e
  Azimuth: 0.3°
-  🔹 Point 0: Distance = 0 m, RSSI = 0
-  🔹 Point 1: Distance = 309.84 m, RSSI = 51
-  🔹 Point 2: Distance = 0 m, RSSI = 0
-  🔹 Point 3: Distance = 325.2 m, RSSI = 51
-  🔹 Point 4: Distance = 0 m, RSSI = 0
-  🔹 Point 5: Distance = 332.88 m, RSSI = 51
-  🔹 Point 6: Distance = 0 m, RSSI = 0
-  🔹 Point 7: Distance = 345.68 m, RSSI = 50
-  🔹 Point 8: Distance = 0 m, RSSI = 0
-  🔹 Point 9: Distance = 355.92 m, RSSI = 51
-  🔹 Point 10: Distance = 0 m, RSSI = 0
-  🔹 Point 11: Distance = 371.28 m, RSSI = 51
-  🔹 Point 12: Distance = 0 m, RSSI = 0
-  🔹 Point 13: Distance = 386.64 m, RSSI = 50
-  🔹 Point 14: Distance = 0 m, RSSI = 0
-  🔹 Point 15: Distance = 402 m, RSSI = 49
 ----------------------------------
- First 4 bytes: ff ee 80 25
  Azimuth: 328.05°
-  🔹 Point 0: Distance = 0 m, RSSI = 0
-  🔹 Point 1: Distance = 550.47 m, RSSI = 27
-  🔹 Point 2: Distance = 0 m, RSSI = 0
-  🔹 Point 3: Distance = 563.27 m, RSSI = 25
-  🔹 Point 4: Distance = 0 m, RSSI = 0
-  🔹 Point 5: Distance = 568.39 m, RSSI = 21
-  🔹 Point 6: Distance = 0 m, RSSI = 0
-  🔹 Point 7: Distance = 586.31 m, RSSI = 14
-  🔹 Point 8: Distance = 0 m, RSSI = 0
-  🔹 Point 9: Distance = 0 m, RSSI = 0
-  🔹 Point 10: Distance = 0 m, RSSI = 0
-  🔹 Point 11: Distance = 0 m, RSSI = 0
-  🔹 Point 12: Distance = 0 m, RSSI = 0
-  🔹 Point 13: Distance = 0 m, RSSI = 0
-  🔹 Point 14: Distance = 0 m, RSSI = 0
-  🔹 Point 15: Distance = 0 m, RSSI = 0
 ----------------------------------
- First 4 bytes: ff ee 0 2d
  Azimuth: 0.45°
-  🔹 Point 0: Distance = 0 m, RSSI = 0
-  🔹 Point 1: Distance = 7.94 m, RSSI = 30
-  🔹 Point 2: Distance = 0 m, RSSI = 0
-  🔹 Point 3: Distance = 15.62 m, RSSI = 31
-  🔹 Point 4: Distance = 0 m, RSSI = 0
-  🔹 Point 5: Distance = 20.74 m, RSSI = 31
-  🔹 Point 6: Distance = 0 m, RSSI = 0
-  🔹 Point 7: Distance = 25.86 m, RSSI = 30
-  🔹 Point 8: Distance = 0 m, RSSI = 0
-  🔹 Point 9: Distance = 33.54 m, RSSI = 31
-  🔹 Point 10: Distance = 0 m, RSSI = 0
-  🔹 Point 11: Distance = 645.37 m, RSSI = 32
-  🔹 Point 12: Distance = 0 m, RSSI = 0
-  🔹 Point 13: Distance = 624.89 m, RSSI = 30
-  🔹 Point 14: Distance = 0 m, RSSI = 0
-  🔹 Point 15: Distance = 0 m, RSSI = 0
 ----------------------------------
- First 4 bytes: ff ee 80 34
  Azimuth: 328.2°
-  🔹 Point 0: Distance = 0 m, RSSI = 0
-  🔹 Point 1: Distance = 0 m, RSSI = 0
-  🔹 Point 2: Distance = 0 m, RSSI = 0
-  🔹 Point 3: Distance = 0 m, RSSI = 0
-  🔹 Point 4: Distance = 0 m, RSSI = 0
-  🔹 Point 5: Distance = 0 m, RSSI = 0
-  🔹 Point 6: Distance = 0 m, RSSI = 0
-  🔹 Point 7: Distance = 0 m, RSSI = 0
-  🔹 Point 8: Distance = 0 m, RSSI = 0
-  🔹 Point 9: Distance = 0 m, RSSI = 0
-  🔹 Point 10: Distance = 0 m, RSSI = 0
-  🔹 Point 11: Distance = 0 m, RSSI = 0
-  🔹 Point 12: Distance = 0 m, RSSI = 0
-  🔹 Point 13: Distance = 0 m, RSSI = 0
-  🔹 Point 14: Distance = 0 m, RSSI = 0
-  🔹 Point 15: Distance = 0 m, RSSI = 0
 ----------------------------------
- First 4 bytes: ff ee 0 3c
  Azimuth: 0.6°
-  🔹 Point 0: Distance = 0 m, RSSI = 0
-  🔹 Point 1: Distance = 552.96 m, RSSI = 162
-  🔹 Point 2: Distance = 0 m, RSSI = 0
-  🔹 Point 3: Distance = 558.08 m, RSSI = 160
-  🔹 Point 4: Distance = 0 m, RSSI = 0
-  🔹 Point 5: Distance = 573.44 m, RSSI = 159
-  🔹 Point 6: Distance = 0 m, RSSI = 0
-  🔹 Point 7: Distance = 578.56 m, RSSI = 158
-  🔹 Point 8: Distance = 0 m, RSSI = 0
-  🔹 Point 9: Distance = 578.56 m, RSSI = 156
-  🔹 Point 10: Distance = 0 m, RSSI = 0
-  🔹 Point 11: Distance = 581.12 m, RSSI = 157
-  🔹 Point 12: Distance = 0 m, RSSI = 0
-  🔹 Point 13: Distance = 583.68 m, RSSI = 158
-  🔹 Point 14: Distance = 0 m, RSSI = 0
-  🔹 Point 15: Distance = 581.12 m, RSSI = 159
 ----------------------------------
- First 4 bytes: ff ee 80 43
  Azimuth: 328.35°
-  🔹 Point 0: Distance = 0 m, RSSI = 0
-  🔹 Point 1: Distance = 440.33 m, RSSI = 127
-  🔹 Point 2: Distance = 0 m, RSSI = 0
-  🔹 Point 3: Distance = 435.21 m, RSSI = 128
-  🔹 Point 4: Distance = 0 m, RSSI = 0
-  🔹 Point 5: Distance = 432.65 m, RSSI = 130
-  🔹 Point 6: Distance = 0 m, RSSI = 0
-  🔹 Point 7: Distance = 414.73 m, RSSI = 132
-  🔹 Point 8: Distance = 0 m, RSSI = 0
-  🔹 Point 9: Distance = 437.77 m, RSSI = 131
-  🔹 Point 10: Distance = 0 m, RSSI = 0
-  🔹 Point 11: Distance = 437.77 m, RSSI = 132
-  🔹 Point 12: Distance = 0 m, RSSI = 0
-  🔹 Point 13: Distance = 460.81 m, RSSI = 132
-  🔹 Point 14: Distance = 0 m, RSSI = 0
-  🔹 Point 15: Distance = 486.41 m, RSSI = 130
 ----------------------------------
- First 4 bytes: ff ee 0 4b
  Azimuth: 0.75°
-  🔹 Point 0: Distance = 0 m, RSSI = 0
-  🔹 Point 1: Distance = 209.97 m, RSSI = 54
-  🔹 Point 2: Distance = 0 m, RSSI = 0
-  🔹 Point 3: Distance = 199.73 m, RSSI = 53
-  🔹 Point 4: Distance = 0 m, RSSI = 0
-  🔹 Point 5: Distance = 192.05 m, RSSI = 53
-  🔹 Point 6: Distance = 0 m, RSSI = 0
-  🔹 Point 7: Distance = 186.93 m, RSSI = 53
-  🔹 Point 8: Distance = 0 m, RSSI = 0
-  🔹 Point 9: Distance = 174.13 m, RSSI = 53
-  🔹 Point 10: Distance = 0 m, RSSI = 0
-  🔹 Point 11: Distance = 171.57 m, RSSI = 53
-  🔹 Point 12: Distance = 0 m, RSSI = 0
-  🔹 Point 13: Distance = 156.21 m, RSSI = 54
-  🔹 Point 14: Distance = 0 m, RSSI = 0
-  🔹 Point 15: Distance = 143.41 m, RSSI = 54
 ----------------------------------
- First 4 bytes: ff ee 80 52
  Azimuth: 328.5°
-  🔹 Point 0: Distance = 0 m, RSSI = 0
-  🔹 Point 1: Distance = 465.97 m, RSSI = 34
-  🔹 Point 2: Distance = 0 m, RSSI = 0
-  🔹 Point 3: Distance = 471.09 m, RSSI = 34
-  🔹 Point 4: Distance = 0 m, RSSI = 0
-  🔹 Point 5: Distance = 478.77 m, RSSI = 33
-  🔹 Point 6: Distance = 0 m, RSSI = 0
-  🔹 Point 7: Distance = 491.57 m, RSSI = 32
-  🔹 Point 8: Distance = 0 m, RSSI = 0
-  🔹 Point 9: Distance = 522.29 m, RSSI = 32
-  🔹 Point 10: Distance = 0 m, RSSI = 0
-  🔹 Point 11: Distance = 0 m, RSSI = 0
-  🔹 Point 12: Distance = 0 m, RSSI = 0
-  🔹 Point 13: Distance = 0 m, RSSI = 0
-  🔹 Point 14: Distance = 0 m, RSSI = 0
-  🔹 Point 15: Distance = 647.74 m, RSSI = 31
 ----------------------------------
- First 4 bytes: ff ee 0 5a
  Azimuth: 0.9°
-  🔹 Point 0: Distance = 0 m, RSSI = 0
-  🔹 Point 1: Distance = 268.88 m, RSSI = 33
-  🔹 Point 2: Distance = 0 m, RSSI = 0
-  🔹 Point 3: Distance = 0 m, RSSI = 0
-  🔹 Point 4: Distance = 0 m, RSSI = 0
-  🔹 Point 5: Distance = 0 m, RSSI = 0
-  🔹 Point 6: Distance = 0 m, RSSI = 0
-  🔹 Point 7: Distance = 176.71 m, RSSI = 35
-  🔹 Point 8: Distance = 0 m, RSSI = 0
-  🔹 Point 9: Distance = 153.67 m, RSSI = 35
-  🔹 Point 10: Distance = 0 m, RSSI = 0
-  🔹 Point 11: Distance = 128.07 m, RSSI = 36
-  🔹 Point 12: Distance = 0 m, RSSI = 0
-  🔹 Point 13: Distance = 110.15 m, RSSI = 36
-  🔹 Point 14: Distance = 0 m, RSSI = 0
-  🔹 Point 15: Distance = 94.79 m, RSSI = 38
+  🔹 Point  1: Distance = 6.92 m, RSSI = 79
+  🔹 Point  3: Distance = 6.15 m, RSSI = 79
+  🔹 Point  5: Distance = 6.41 m, RSSI = 78
+  🔹 Point  7: Distance = 6.41 m, RSSI = 78
+  🔹 Point  9: Distance = 6.41 m, RSSI = 79
+  🔹 Point 11: Distance = 6.41 m, RSSI = 78
+  🔹 Point 13: Distance = 6.15 m, RSSI = 78
+  🔹 Point 15: Distance = 5.89 m, RSSI = 79
 ----------------------------------
- First 4 bytes: ff ee 80 61
  Azimuth: 328.65°
-  🔹 Point 0: Distance = 0 m, RSSI = 0
-  🔹 Point 1: Distance = 69.17 m, RSSI = 32
-  🔹 Point 2: Distance = 0 m, RSSI = 0
-  🔹 Point 3: Distance = 58.93 m, RSSI = 32
-  🔹 Point 4: Distance = 0 m, RSSI = 0
-  🔹 Point 5: Distance = 48.69 m, RSSI = 32
-  🔹 Point 6: Distance = 0 m, RSSI = 0
-  🔹 Point 7: Distance = 35.89 m, RSSI = 33
-  🔹 Point 8: Distance = 0 m, RSSI = 0
-  🔹 Point 9: Distance = 25.65 m, RSSI = 33
-  🔹 Point 10: Distance = 0 m, RSSI = 0
-  🔹 Point 11: Distance = 17.97 m, RSSI = 34
-  🔹 Point 12: Distance = 0 m, RSSI = 0
-  🔹 Point 13: Distance = 17.97 m, RSSI = 34
-  🔹 Point 14: Distance = 0 m, RSSI = 0
-  🔹 Point 15: Distance = 25.65 m, RSSI = 33
+  🔹 Point  1: Distance = 13.06 m, RSSI = 65
 ----------------------------------
- First 4 bytes: ff ee 0 69
  Azimuth: 1.05°
-  🔹 Point 0: Distance = 0 m, RSSI = 0
-  🔹 Point 1: Distance = 537.7 m, RSSI = 35
-  🔹 Point 2: Distance = 0 m, RSSI = 0
-  🔹 Point 3: Distance = 530.02 m, RSSI = 35
-  🔹 Point 4: Distance = 0 m, RSSI = 0
-  🔹 Point 5: Distance = 524.9 m, RSSI = 35
-  🔹 Point 6: Distance = 0 m, RSSI = 0
-  🔹 Point 7: Distance = 522.34 m, RSSI = 35
-  🔹 Point 8: Distance = 0 m, RSSI = 0
-  🔹 Point 9: Distance = 517.22 m, RSSI = 35
-  🔹 Point 10: Distance = 0 m, RSSI = 0
-  🔹 Point 11: Distance = 504.42 m, RSSI = 36
-  🔹 Point 12: Distance = 0 m, RSSI = 0
-  🔹 Point 13: Distance = 499.3 m, RSSI = 36
-  🔹 Point 14: Distance = 0 m, RSSI = 0
-  🔹 Point 15: Distance = 486.5 m, RSSI = 36
+----------------------------------
+ Azimuth: 328.80°
+  🔹 Point 15: Distance = 2.57 m, RSSI = 43
+----------------------------------
+ Azimuth: 1.20°
+  🔹 Point  1: Distance = 12.03 m, RSSI = 183
+  🔹 Point  3: Distance = 11.78 m, RSSI = 184
+  🔹 Point  5: Distance = 11.52 m, RSSI = 185
+  🔹 Point  7: Distance = 11.52 m, RSSI = 184
+  🔹 Point  9: Distance = 11.27 m, RSSI = 186
+  🔹 Point 11: Distance = 10.75 m, RSSI = 186
+  🔹 Point 13: Distance = 11.01 m, RSSI = 186
+  🔹 Point 15: Distance = 10.75 m, RSSI = 186
+----------------------------------
+ Azimuth: 328.95°
+----------------------------------
+ Azimuth: 1.35°
+----------------------------------
+ Azimuth: 0.00°
+----------------------------------
+ Azimuth: 327.75°
+----------------------------------
+ Azimuth: 0.15°
+----------------------------------
+ Azimuth: 327.90°
+----------------------------------
+ Azimuth: 0.30°
+----------------------------------
+ Azimuth: 328.05°
+----------------------------------
+ Azimuth: 0.45°
+----------------------------------
+ Azimuth: 328.20°
+----------------------------------
+ Azimuth: 0.60°
+----------------------------------
+ Azimuth: 328.35°
+----------------------------------
+ Azimuth: 0.75°
+----------------------------------
+ Azimuth: 328.50°
+----------------------------------
+ Azimuth: 0.90°
+  🔹 Point  1: Distance = 6.92 m, RSSI = 79
+  🔹 Point  3: Distance = 6.41 m, RSSI = 79
+  🔹 Point  5: Distance = 6.41 m, RSSI = 78
+  🔹 Point  7: Distance = 6.41 m, RSSI = 78
+  🔹 Point  9: Distance = 6.41 m, RSSI = 79
+  🔹 Point 11: Distance = 6.15 m, RSSI = 78
+  🔹 Point 13: Distance = 6.41 m, RSSI = 78
+  🔹 Point 15: Distance = 5.89 m, RSSI = 79
+----------------------------------
+ Azimuth: 328.65°
+  🔹 Point  1: Distance = 13.32 m, RSSI = 65
+----------------------------------
+ Azimuth: 1.05°
+----------------------------------
+ Azimuth: 328.80°
+----------------------------------
+ Azimuth: 1.20°
+  🔹 Point  1: Distance = 12.29 m, RSSI = 182
+  🔹 Point  3: Distance = 12.03 m, RSSI = 183
+  🔹 Point  5: Distance = 11.52 m, RSSI = 183
+  🔹 Point  7: Distance = 11.52 m, RSSI = 186
+  🔹 Point  9: Distance = 11.27 m, RSSI = 185
+  🔹 Point 11: Distance = 11.01 m, RSSI = 183
+  🔹 Point 13: Distance = 11.01 m, RSSI = 186
+  🔹 Point 15: Distance = 11.01 m, RSSI = 184
+----------------------------------
+ Azimuth: 328.95°
+----------------------------------
+ Azimuth: 1.35°
+----------------------------------
+ Azimuth: 0.00°
+----------------------------------
+ Azimuth: 327.75°
+----------------------------------
+ Azimuth: 0.15°
+----------------------------------
+ Azimuth: 327.90°
+----------------------------------
+ Azimuth: 0.30°
+----------------------------------
+ Azimuth: 328.05°
+----------------------------------
+ Azimuth: 0.45°
+----------------------------------
+ Azimuth: 328.20°
+----------------------------------
+ Azimuth: 0.60°
+----------------------------------
+ Azimuth: 328.35°
+----------------------------------
+ Azimuth: 0.75°
+----------------------------------
+ Azimuth: 328.50°
+----------------------------------
+ Azimuth: 0.90°
+  🔹 Point  1: Distance = 7.17 m, RSSI = 80
+  🔹 Point  3: Distance = 6.15 m, RSSI = 79
+  🔹 Point  5: Distance = 6.66 m, RSSI = 78
+  🔹 Point  7: Distance = 6.66 m, RSSI = 78
+  🔹 Point  9: Distance = 6.66 m, RSSI = 79
+  🔹 Point 11: Distance = 6.66 m, RSSI = 78
+  🔹 Point 13: Distance = 6.66 m, RSSI = 79
+  🔹 Point 15: Distance = 6.41 m, RSSI = 79
+----------------------------------
+ Azimuth: 328.65°
+  🔹 Point  1: Distance = 13.32 m, RSSI = 66
+----------------------------------
+ Azimuth: 1.05°
+----------------------------------
+ Azimuth: 328.80°
+  🔹 Point 15: Distance = 8.45 m, RSSI = 43
+----------------------------------
+ Azimuth: 1.20°
+  🔹 Point  1: Distance = 12.03 m, RSSI = 185
+  🔹 Point  3: Distance = 11.78 m, RSSI = 185
+  🔹 Point  5: Distance = 11.52 m, RSSI = 185
+  🔹 Point  7: Distance = 11.78 m, RSSI = 184
+  🔹 Point  9: Distance = 11.27 m, RSSI = 186
+  🔹 Point 11: Distance = 11.78 m, RSSI = 182
+  🔹 Point 13: Distance = 11.27 m, RSSI = 184
+  🔹 Point 15: Distance = 11.01 m, RSSI = 186
+----------------------------------
+ Azimuth: 328.95°
+----------------------------------
+ Azimuth: 1.35°
+----------------------------------
+ Azimuth: 0.00°
+----------------------------------
+ Azimuth: 327.75°
+----------------------------------
+ Azimuth: 0.15°
+----------------------------------
+ Azimuth: 327.90°
+----------------------------------
+ Azimuth: 0.30°
+----------------------------------
+ Azimuth: 328.05°
+----------------------------------
+ Azimuth: 0.45°
+----------------------------------
+ Azimuth: 328.20°
+----------------------------------
+ Azimuth: 0.60°
+----------------------------------
+ Azimuth: 328.35°
+----------------------------------
+ Azimuth: 0.75°
+----------------------------------
+ Azimuth: 328.50°
+----------------------------------
+ Azimuth: 0.90°
+  🔹 Point  1: Distance = 6.92 m, RSSI = 80
+  🔹 Point  3: Distance = 6.15 m, RSSI = 79
+  🔹 Point  5: Distance = 6.41 m, RSSI = 78
+  🔹 Point  7: Distance = 6.41 m, RSSI = 79
+  🔹 Point  9: Distance = 6.66 m, RSSI = 79
+  🔹 Point 11: Distance = 6.15 m, RSSI = 78
+  🔹 Point 13: Distance = 6.41 m, RSSI = 78
+  🔹 Point 15: Distance = 5.89 m, RSSI = 79
+----------------------------------
+ Azimuth: 328.65°
+  🔹 Point  1: Distance = 13.06 m, RSSI = 65
+----------------------------------
+ Azimuth: 1.05°
+----------------------------------
+ Azimuth: 328.80°
+  🔹 Point 15: Distance = 5.13 m, RSSI = 43
+----------------------------------
+ Azimuth: 1.20°
+  🔹 Point  1: Distance = 12.29 m, RSSI = 182
+  🔹 Point  3: Distance = 11.78 m, RSSI = 185
+  🔹 Point  5: Distance = 11.27 m, RSSI = 186
+  🔹 Point  7: Distance = 11.52 m, RSSI = 186
+  🔹 Point  9: Distance = 11.01 m, RSSI = 186
+  🔹 Point 11: Distance = 11.01 m, RSSI = 186
+  🔹 Point 13: Distance = 11.01 m, RSSI = 186
+  🔹 Point 15: Distance = 11.01 m, RSSI = 186
+----------------------------------
+ Azimuth: 328.95°
+----------------------------------
+ Azimuth: 1.35°
+----------------------------------
+ Azimuth: 0.00°
+----------------------------------
+ Azimuth: 327.75°
+----------------------------------
+ Azimuth: 0.15°
+----------------------------------
+ Azimuth: 327.90°
+----------------------------------
+ Azimuth: 0.30°
+----------------------------------
+ Azimuth: 328.05°
+----------------------------------
+ Azimuth: 0.45°
+----------------------------------
+ Azimuth: 328.20°
+----------------------------------
+ Azimuth: 0.60°
+----------------------------------
+ Azimuth: 328.35°
+----------------------------------
+ Azimuth: 0.75°
+----------------------------------
+ Azimuth: 328.50°
+----------------------------------
+ Azimuth: 0.90°
+  🔹 Point  1: Distance = 7.17 m, RSSI = 80
+  🔹 Point  3: Distance = 6.66 m, RSSI = 79
+  🔹 Point  5: Distance = 6.41 m, RSSI = 79
+  🔹 Point  7: Distance = 6.66 m, RSSI = 78
+  🔹 Point  9: Distance = 6.66 m, RSSI = 79
+  🔹 Point 11: Distance = 5.89 m, RSSI = 79
+  🔹 Point 13: Distance = 6.66 m, RSSI = 78
+  🔹 Point 15: Distance = 6.15 m, RSSI = 79
+----------------------------------
+ Azimuth: 328.65°
+  🔹 Point  1: Distance = 12.55 m, RSSI = 66
+----------------------------------
+ Azimuth: 1.05°
+----------------------------------
+ Azimuth: 328.80°
+  🔹 Point 15: Distance = 7.43 m, RSSI = 43
+----------------------------------
+ Azimuth: 1.20°
+  🔹 Point  1: Distance = 12.03 m, RSSI = 182
+  🔹 Point  3: Distance = 11.52 m, RSSI = 185
+  🔹 Point  5: Distance = 11.27 m, RSSI = 183
+  🔹 Point  7: Distance = 11.52 m, RSSI = 186
+  🔹 Point  9: Distance = 11.27 m, RSSI = 186
+  🔹 Point 11: Distance = 11.01 m, RSSI = 186
+  🔹 Point 13: Distance = 11.27 m, RSSI = 184
+  🔹 Point 15: Distance = 11.01 m, RSSI = 186
+----------------------------------
+ Azimuth: 328.95°
+----------------------------------
+ Azimuth: 1.35°
+----------------------------------
+ Azimuth: 0.00°
+----------------------------------
+ Azimuth: 327.75°
+----------------------------------
+ Azimuth: 0.15°
+----------------------------------
+ Azimuth: 327.90°
+----------------------------------
+ Azimuth: 0.30°
+----------------------------------
+ Azimuth: 328.05°
+----------------------------------
+ Azimuth: 0.45°
+----------------------------------
+ Azimuth: 328.20°
+----------------------------------
+ Azimuth: 0.60°
+----------------------------------
+ Azimuth: 328.35°
+----------------------------------
+ Azimuth: 0.75°
+----------------------------------
+ Azimuth: 328.50°
+----------------------------------
+ Azimuth: 0.90°
+  🔹 Point  1: Distance = 6.92 m, RSSI = 80
+  🔹 Point  3: Distance = 6.41 m, RSSI = 79
+  🔹 Point  5: Distance = 6.41 m, RSSI = 78
+  🔹 Point  7: Distance = 6.41 m, RSSI = 79
+  🔹 Point  9: Distance = 6.15 m, RSSI = 79
+  🔹 Point 11: Distance = 5.64 m, RSSI = 78
+  🔹 Point 13: Distance = 6.41 m, RSSI = 78
+  🔹 Point 15: Distance = 5.64 m, RSSI = 79
+----------------------------------
+ Azimuth: 328.65°
+  🔹 Point  1: Distance = 13.32 m, RSSI = 65
+----------------------------------
+ Azimuth: 1.05°
+----------------------------------
+ Azimuth: 328.80°
+  🔹 Point 15: Distance = 3.08 m, RSSI = 43
+----------------------------------
+ Azimuth: 1.20°
+  🔹 Point  1: Distance = 12.03 m, RSSI = 183
+  🔹 Point  3: Distance = 11.52 m, RSSI = 184
+  🔹 Point  5: Distance = 11.01 m, RSSI = 185
+  🔹 Point  7: Distance = 11.27 m, RSSI = 186
+  🔹 Point  9: Distance = 10.75 m, RSSI = 186
+  🔹 Point 11: Distance = 11.01 m, RSSI = 186
+  🔹 Point 13: Distance = 11.27 m, RSSI = 184
+  🔹 Point 15: Distance = 11.01 m, RSSI = 186
+----------------------------------
+ Azimuth: 328.95°
+----------------------------------
+ Azimuth: 1.35°
+----------------------------------
+ Azimuth: 0.00°
+----------------------------------
+ Azimuth: 327.75°
+----------------------------------
+ Azimuth: 0.15°
+----------------------------------
+ Azimuth: 327.90°
+----------------------------------
+ Azimuth: 0.30°
+----------------------------------
+ Azimuth: 328.05°
+----------------------------------
+ Azimuth: 0.45°
+----------------------------------
+ Azimuth: 328.20°
+----------------------------------
+ Azimuth: 0.60°
+----------------------------------
+ Azimuth: 328.35°
+----------------------------------
+ Azimuth: 0.75°
+----------------------------------
+ Azimuth: 328.50°
+----------------------------------
+ Azimuth: 0.90°
+  🔹 Point  1: Distance = 6.92 m, RSSI = 80
+  🔹 Point  3: Distance = 6.66 m, RSSI = 79
+  🔹 Point  5: Distance = 6.41 m, RSSI = 79
+  🔹 Point  7: Distance = 6.41 m, RSSI = 79
+  🔹 Point  9: Distance = 6.15 m, RSSI = 79
+  🔹 Point 11: Distance = 5.64 m, RSSI = 79
+  🔹 Point 13: Distance = 5.89 m, RSSI = 79
+  🔹 Point 15: Distance = 5.89 m, RSSI = 79
+----------------------------------
+ Azimuth: 328.65°
+  🔹 Point  1: Distance = 12.04 m, RSSI = 66
+----------------------------------
+ Azimuth: 1.05°
+----------------------------------
+ Azimuth: 328.80°
+  🔹 Point 15: Distance = 3.34 m, RSSI = 44
+----------------------------------
+ Azimuth: 1.20°
+----------------------------------
+ Azimuth: 328.95°
+----------------------------------
+ Azimuth: 1.35°
+----------------------------------
+ Azimuth: 0.00°
+----------------------------------
+ Azimuth: 327.75°
+----------------------------------
+ Azimuth: 0.15°
+----------------------------------
+ Azimuth: 327.90°
+----------------------------------
+ Azimuth: 0.30°
+----------------------------------
+ Azimuth: 328.05°
+----------------------------------
+ Azimuth: 0.45°
+----------------------------------
+ Azimuth: 328.20°
+----------------------------------
+ Azimuth: 0.60°
+----------------------------------
+ Azimuth: 328.35°
+----------------------------------
+ Azimuth: 0.75°
+----------------------------------
+ Azimuth: 328.50°
+----------------------------------
+ Azimuth: 0.90°
+  🔹 Point  1: Distance = 6.92 m, RSSI = 80
+  🔹 Point  3: Distance = 6.66 m, RSSI = 79
+  🔹 Point  5: Distance = 6.92 m, RSSI = 78
+  🔹 Point  7: Distance = 6.66 m, RSSI = 79
+  🔹 Point  9: Distance = 6.15 m, RSSI = 79
+  🔹 Point 11: Distance = 5.89 m, RSSI = 78
+  🔹 Point 13: Distance = 5.89 m, RSSI = 79
+  🔹 Point 15: Distance = 5.64 m, RSSI = 79
+----------------------------------
+ Azimuth: 328.65°
+  🔹 Point  1: Distance = 13.32 m, RSSI = 65
+----------------------------------
+ Azimuth: 1.05°
+----------------------------------
+ Azimuth: 328.80°
+  🔹 Point 15: Distance = 4.10 m, RSSI = 43
+----------------------------------
+ Azimuth: 1.20°
+  🔹 Point  1: Distance = 12.29 m, RSSI = 182
+  🔹 Point  3: Distance = 11.78 m, RSSI = 183
+  🔹 Point  5: Distance = 11.78 m, RSSI = 183
+  🔹 Point  7: Distance = 11.52 m, RSSI = 184
+  🔹 Point  9: Distance = 11.01 m, RSSI = 186
+  🔹 Point 11: Distance = 11.01 m, RSSI = 186
+  🔹 Point 13: Distance = 11.78 m, RSSI = 184
+  🔹 Point 15: Distance = 11.27 m, RSSI = 184
+----------------------------------
+ Azimuth: 328.95°
+----------------------------------
+ Azimuth: 1.35°
+----------------------------------
