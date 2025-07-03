@@ -1,4 +1,5 @@
 // lidar_reader.cpp
+
 #include "lidar_reader.hpp"
 #include "data_type.h"
 
@@ -9,7 +10,6 @@
 #include <stdexcept>
 #include <limits>
 #include <cmath>
-#include <vector>
 
 #ifndef M_PI
 static constexpr double M_PI = 3.14159265358979323846;
@@ -26,16 +26,17 @@ LiDARReader::LiDARReader(const std::string& /*host_ip*/,
   : angle_offset_(angle_offset),
     inverted_(inverted)
 {
-  // bind to ANY address on the given UDP port
+  // bind to ANY on the given UDP port
   sockfd_ = socket(AF_INET, SOCK_DGRAM, 0);
   if (sockfd_ < 0) throw std::runtime_error("socket() failed");
-
   int yes = 1;
   setsockopt(sockfd_, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
+
   sockaddr_in addr{};
   addr.sin_family      = AF_INET;
   addr.sin_addr.s_addr = htonl(INADDR_ANY);
   addr.sin_port        = htons(port);
+
   if (bind(sockfd_, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) < 0)
     throw std::runtime_error("bind() failed");
 }
@@ -54,56 +55,51 @@ void LiDARReader::recvPacket(MSOP_Data_t& buf) {
 }
 
 std::vector<ScanPoint> LiDARReader::readScan() {
-  // container for 12*16 = 192 points
-  std::vector<ScanPoint> scan(BLOCKS_PER_SCAN * POINTS_PER_BLOCK);
+  // 1) Grab exactly one MSOP UDP packet
+  MSOP_Data_t packet;
+  recvPacket(packet);
 
-  // 1) Read all 12 blocks into an array
-  Data_block blocks[BLOCKS_PER_SCAN];
+  // 2) Byte-swap all 12 data blocks in place
   for (int b = 0; b < BLOCKS_PER_SCAN; ++b) {
-    MSOP_Data_t packet;
-    recvPacket(packet);
-    // byte‐swap the header
-    auto blk = packet.BlockID[b];
+    auto &blk = packet.BlockID[b];
     blk.DataFlag = ntohs(blk.DataFlag);
     blk.Azimuth  = ntohs(blk.Azimuth);
-    // byte‐swap each distance
-    for (int i = 0; i < POINTS_PER_BLOCK; ++i)
-      blk.Result[i].Dist_1 = ntohs(blk.Result[i].Dist_1);
-    blocks[b] = blk;
-  }
-
-  // 2) Compute angular step *per block* in degrees
-  //    (Azimuth fields are in hundredths of a degree)
-  double step_deg[BLOCKS_PER_SCAN];
-  for (int b = 0; b < BLOCKS_PER_SCAN - 1; ++b) {
-    double a0 = blocks[b].Azimuth   / 100.0;
-    double a1 = blocks[b+1].Azimuth / 100.0;
-    step_deg[b] = (a1 - a0) / POINTS_PER_BLOCK;
-  }
-  // for the last block, reuse the previous block’s step
-  step_deg[BLOCKS_PER_SCAN - 1] = step_deg[BLOCKS_PER_SCAN - 2];
-
-  // 3) Fill the scan vector
-  for (int b = 0; b < BLOCKS_PER_SCAN; ++b) {
-    const auto &blk = blocks[b];
-    // base angle in degrees
-    double base_deg = blk.Azimuth / 100.0 + angle_offset_;
     for (int i = 0; i < POINTS_PER_BLOCK; ++i) {
-      double raw_deg = base_deg + step_deg[b] * i;
+      blk.Result[i].Dist_1 = ntohs(blk.Result[i].Dist_1);
+    }
+  }
+
+  // 3) Compute the per-beam angular increment (in degrees)
+  //    Azimuth is in hundredths of a degree.
+  double az0_deg   = packet.BlockID[0].Azimuth / 100.0;
+  double az1_deg   = packet.BlockID[1].Azimuth / 100.0;
+  double step_deg  = (az1_deg - az0_deg) / POINTS_PER_BLOCK;
+
+  // 4) Allocate output vector
+  std::vector<ScanPoint> scan(BLOCKS_PER_SCAN * POINTS_PER_BLOCK);
+
+  // 5) Fill it in beam order
+  for (int b = 0; b < BLOCKS_PER_SCAN; ++b) {
+    const auto &blk = packet.BlockID[b];
+    double base_deg = blk.Azimuth / 100.0 + angle_offset_;
+
+    for (int i = 0; i < POINTS_PER_BLOCK; ++i) {
+      double raw_deg = base_deg + step_deg * i;
       double ang_rad = raw_deg * M_PI / 180.0;
 
-      double dist_m = blk.Result[i].Dist_1 / 1000.0;
-      double inten  = blk.Result[i].RSSI_1;
-      if (dist_m <= 0) {
-        dist_m = INF_DIST;
-        inten  = 0;
+      double dist_m   = blk.Result[i].Dist_1 / 1000.0;
+      double intensity = blk.Result[i].RSSI_1;
+      // filter out invalid blocks or zero ranges
+      if (blk.DataFlag != 0xEEFF || dist_m <= 0) {
+        dist_m   = INF_DIST;
+        intensity = 0;
       }
 
       int idx = b * POINTS_PER_BLOCK + i;
-      if (inverted_)
-        idx = static_cast<int>(scan.size()) - 1 - idx;
-
-      scan[idx] = { ang_rad, dist_m, inten };
+      if (inverted_) {
+        idx = BLOCKS_PER_SCAN * POINTS_PER_BLOCK - 1 - idx;
+      }
+      scan[idx] = { ang_rad, dist_m, intensity };
     }
   }
 
