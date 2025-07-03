@@ -1,12 +1,11 @@
-#include <iostream>
+\#include <iostream>
 #include <iomanip>
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <cmath>
 
 #define PORT 2368
-#define BUFLEN 1206
-#define HEADER_FLAG 0xFFEE
+#define BUFLEN 2048  // allow more space than 1206
 
 uint16_t read_be16(const uint8_t* data) {
     return (data[0] << 8) | data[1];
@@ -23,22 +22,37 @@ int main() {
     si_me.sin_addr.s_addr = htonl(INADDR_ANY);
     bind(sockfd, (struct sockaddr*)&si_me, sizeof(si_me));
 
-    std::cout << "Listening on port " << PORT << "...\n";
+    std::cout << " Listening on port " << PORT << "...\n";
 
     while (true) {
         ssize_t len = recv(sockfd, buffer, BUFLEN, 0);
-        if (len != BUFLEN) continue;
+        if (len < 100) {
+            std::cout << "❌ Short packet (" << len << " bytes), skipping...\n";
+            continue;
+        }
+
+        // Debug: print first few bytes
+        std::cout << std::hex << " First 4 bytes: "
+                  << (int)buffer[0] << " " << (int)buffer[1] << " "
+                  << (int)buffer[2] << " " << (int)buffer[3] << "\n";
 
         uint16_t flag = read_be16(buffer);
-        if (flag != HEADER_FLAG) continue;
+        if (flag != 0xFFEE) {
+            std::cout << " Invalid header flag: " << std::hex << flag << "\n";
+            continue;
+        }
 
         uint16_t az_raw = read_be16(buffer + 2);
-        if (az_raw == 0xFFFF) continue;
+        if (az_raw == 0xFFFF) {
+            std::cout << " Azimuth invalid\n";
+            continue;
+        }
 
         float az_deg = az_raw / 100.0f;
-        if (az_deg < 45.0f || az_deg > 315.0f) continue;
+        std::cout << std::dec << "🔄 Azimuth: " << az_deg << "°\n";
 
-        std::cout << " Azimuth: " << az_deg << "°\n";
+        // Disable angle filter for now
+        // if (az_deg < 45.0f || az_deg > 315.0f) continue;
 
         for (int i = 0; i < 16; ++i) {
             const uint8_t* p = buffer + 4 + i * 6;
@@ -48,7 +62,8 @@ int main() {
             if (dist == 0xFFFF) continue;
 
             float meters = dist / 100.0f;
-            std::cout << "  🔹 Point " << i << ": Distance = " << meters << " m, RSSI = " << (int)rssi << "\n";
+            std::cout << "  🔹 Point " << i << ": Distance = " << meters
+                      << " m, RSSI = " << (int)rssi << "\n";
         }
 
         std::cout << "----------------------------------\n";
