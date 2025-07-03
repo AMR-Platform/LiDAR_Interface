@@ -1,36 +1,5 @@
-In file included from /home/savindu/LiDAR_Interface/slam_lidar_cpp/src/lidar_reader.cpp:1:
-/home/savindu/LiDAR_Interface/slam_lidar_cpp/src/lidar_reader.hpp:28:19: error: ‘MSOP_Data_t’ has not been declared
-   28 |   void recvPacket(MSOP_Data_t& buf);
-      |                   ^~~~~~~~~~~
-/home/savindu/LiDAR_Interface/slam_lidar_cpp/src/lidar_reader.cpp:44:6: error: no declaration matches ‘void LiDARReader::recvPacket(MSOP_Data_t&)’
-   44 | void LiDARReader::recvPacket(MSOP_Data_t& buf) {
-      |      ^~~~~~~~~~~
-In file included from /home/savindu/LiDAR_Interface/slam_lidar_cpp/src/lidar_reader.cpp:1:
-/home/savindu/LiDAR_Interface/slam_lidar_cpp/src/lidar_reader.hpp:28:8: note: candidate is: ‘void LiDARReader::recvPacket(int&)’
-   28 |   void recvPacket(MSOP_Data_t& buf);
-      |        ^~~~~~~~~~
-/home/savindu/LiDAR_Interface/slam_lidar_cpp/src/lidar_reader.hpp:11:7: note: ‘class LiDARReader’ defined here
-   11 | class LiDARReader {
-      |       ^~~~~~~~~~~
+[ 25%] Building CXX object CMakeFiles/lidar_reader.dir/src/lidar_reader.cpp.o
 /home/savindu/LiDAR_Interface/slam_lidar_cpp/src/lidar_reader.cpp: In member function ‘std::vector<ScanPoint> LiDARReader::readScan()’:
-/home/savindu/LiDAR_Interface/slam_lidar_cpp/src/lidar_reader.cpp:60:16: error: cannot convert ‘MSOP_Data_t’ to ‘int&’
-   60 |     recvPacket(packet);
-      |                ^~~~~~
-      |                |
-      |                MSOP_Data_t
-In file included from /home/savindu/LiDAR_Interface/slam_lidar_cpp/src/lidar_reader.cpp:1:
-/home/savindu/LiDAR_Interface/slam_lidar_cpp/src/lidar_reader.hpp:28:32: note:   initializing argument 1 of ‘void LiDARReader::recvPacket(int&)’
-   28 |   void recvPacket(MSOP_Data_t& buf);
-      |                   ~~~~~~~~~~~~~^~~
-/home/savindu/LiDAR_Interface/slam_lidar_cpp/src/lidar_reader.cpp:69:27: error: cannot convert ‘MSOP_Data_t’ to ‘int&’
-   69 |     if (b > 0) recvPacket(packet);
-      |                           ^~~~~~
-      |                           |
-      |                           MSOP_Data_t
-In file included from /home/savindu/LiDAR_Interface/slam_lidar_cpp/src/lidar_reader.cpp:1:
-/home/savindu/LiDAR_Interface/slam_lidar_cpp/src/lidar_reader.hpp:28:32: note:   initializing argument 1 of ‘void LiDARReader::recvPacket(int&)’
-   28 |   void recvPacket(MSOP_Data_t& buf);
-      |                   ~~~~~~~~~~~~~^~~
 /home/savindu/LiDAR_Interface/slam_lidar_cpp/src/lidar_reader.cpp:76:34: error: ‘M_PI’ was not declared in this scope
    76 |       double ang_rad = raw_ang * M_PI / 180.0;
       |                                  ^~~~
