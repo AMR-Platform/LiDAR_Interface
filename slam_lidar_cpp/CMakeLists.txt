@@ -15,3 +15,12 @@ add_executable(main_app
   src/main.cpp
 )
 target_link_libraries(main_app lidar_reader)
+
+# Raw packet reader for debugging
+add_executable(read_packets
+  src/read_packets.cpp
+)
+target_link_libraries(read_packets
+  # no extra libs needed
+)
+
