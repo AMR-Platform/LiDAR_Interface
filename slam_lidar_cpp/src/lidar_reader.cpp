@@ -1,5 +1,4 @@
-// lidar_reader.cpp
-// Standalone reader for Lakibeam 1S in 270° FOV (45°→315°)
+// src/lidar_reader.cpp
 
 #include "lidar_reader.hpp"
 #include "data_type.h"
@@ -47,7 +46,9 @@ void LiDARReader::setupSocket(int port) {
   addr.sin_addr.s_addr = htonl(INADDR_ANY);
   addr.sin_port        = htons(port);
 
-  if (bind(sockfd_, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) < 0)
+  if (bind(sockfd_,
+           reinterpret_cast<sockaddr*>(&addr),
+           sizeof(addr)) < 0)
     throw std::runtime_error("bind() failed");
 }
 
@@ -61,11 +62,10 @@ void LiDARReader::recvPacket(MSOP_Data_t& buf) {
 }
 
 std::vector<ScanPoint> LiDARReader::readScan() {
-  // Prepare container for 12 blocks × 16 points = 192 beams
   std::vector<ScanPoint> scan(BLOCKS_PER_SCAN * POINTS_PER_BLOCK);
   MSOP_Data_t packet;
 
-  // --- Read first two blocks to compute angular step ---
+  // 1) Read two blocks to get angular step
   recvPacket(packet);
   Data_block b0 = packet.BlockID[0];
   b0.DataFlag = ntohs(b0.DataFlag);
@@ -80,19 +80,17 @@ std::vector<ScanPoint> LiDARReader::readScan() {
   for (int i = 0; i < POINTS_PER_BLOCK; ++i)
     b1.Result[i].Dist_1 = ntohs(b1.Result[i].Dist_1);
 
-  // Compute per-beam step (in degrees)
-  // Azimuth fields are in hundredths of a degree
-  double az0_deg = b0.Azimuth / 100.0;
-  double az1_deg = b1.Azimuth / 100.0;
+  double az0_deg  = b0.Azimuth / 100.0;
+  double az1_deg  = b1.Azimuth / 100.0;
   double step_deg = (az1_deg - az0_deg) / POINTS_PER_BLOCK;
 
-  // --- Collect all 12 blocks into a simple C-array ---
+  // 2) Collect all 12 blocks
   Data_block blocks[BLOCKS_PER_SCAN];
   blocks[0] = b0;
   blocks[1] = b1;
   for (int b = 2; b < BLOCKS_PER_SCAN; ++b) {
     recvPacket(packet);
-    Data_block &blk = packet.BlockID[b];
+    Data_block blk = packet.BlockID[b];
     blk.DataFlag = ntohs(blk.DataFlag);
     blk.Azimuth  = ntohs(blk.Azimuth);
     for (int i = 0; i < POINTS_PER_BLOCK; ++i)
@@ -100,7 +98,7 @@ std::vector<ScanPoint> LiDARReader::readScan() {
     blocks[b] = blk;
   }
 
-  // --- Convert each block's 16 points into ScanPoint entries ---
+  // 3) Parse into ScanPoint
   for (int b = 0; b < BLOCKS_PER_SCAN; ++b) {
     const Data_block &blk = blocks[b];
     double base_deg = blk.Azimuth / 100.0 + angle_offset_;
