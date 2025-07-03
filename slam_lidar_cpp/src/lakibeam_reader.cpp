@@ -40,12 +40,12 @@ int main() {
         return 1;
     }
     
-    std::cout << "🟢 Listening on port " << PORT << "...\n";
+    std::cout << " Listening on port " << PORT << "...\n";
     
     while (true) {
         ssize_t len = recv(sockfd, buffer, BUFLEN, 0);
         
-        std::cout << "📦 Received packet: " << len << " bytes\n";
+        std::cout << " Received packet: " << len << " bytes\n";
         
         // Debug: show first few bytes
         std::cout << "Raw header: ";
@@ -56,19 +56,19 @@ int main() {
         std::cout << std::dec << "\n";
         
         if (len < 1200) {
-            std::cout << "❌ Packet too small (expected ~1248 bytes), might be fragmented\n";
+            std::cout << " Packet too small (expected ~1206 bytes), might be fragmented\n";
             continue;
         }
         
-        // Skip UDP header (42 bytes) and start parsing data blocks
-        const uint8_t* data_start = buffer + 42;
+        // Data starts immediately (UDP header already stripped by OS)
+        const uint8_t* data_start = buffer;
         
         for (int block = 0; block < DATA_BLOCKS_PER_PACKET; block++) {
             const uint8_t* block_ptr = data_start + block * 100;
             
             // Check if we have enough data left
             if (block_ptr + 100 > buffer + len) {
-                std::cout << "❌ Not enough data for block " << block << "\n";
+                std::cout << " Not enough data for block " << block << "\n";
                 break;
             }
             
@@ -78,18 +78,18 @@ int main() {
             
             // Skip invalid blocks
             if (flag == 0xFFFF || azimuth_raw == 0xFFFF) {
-                std::cout << "⚠️  Block " << block << " is invalid (flag: 0x" 
+                std::cout << "⚠  Block " << block << " is invalid (flag: 0x" 
                           << std::hex << flag << ", azimuth: 0x" << azimuth_raw << std::dec << ")\n";
                 continue;
             }
             
             if (flag != HEADER_FLAG) {
-                std::cout << "❌ Invalid block flag: 0x" << std::hex << flag << std::dec << "\n";
+                std::cout << " Invalid block flag: 0x" << std::hex << flag << std::dec << "\n";
                 continue;
             }
             
             float azimuth_deg = azimuth_raw / 100.0f;
-            std::cout << "🔄 Block " << block << " - Azimuth: " << azimuth_deg << "°\n";
+            std::cout << " Block " << block << " - Azimuth: " << azimuth_deg << "°\n";
             
             // Parse 16 measurement points in this block
             for (int point = 0; point < MEASUREMENTS_PER_BLOCK; point++) {
@@ -135,7 +135,7 @@ int main() {
             uint32_t timestamp = read_be32(tail);
             uint16_t factory = read_be16(tail + 4);
             
-            std::cout << "⏰ Timestamp: " << timestamp << " µs, Factory: 0x" 
+            std::cout << " Timestamp: " << timestamp << " µs, Factory: 0x" 
                       << std::hex << factory << std::dec << "\n";
         }
         
