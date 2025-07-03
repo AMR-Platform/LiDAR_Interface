@@ -1,108 +1,24 @@
-#include "lidar_reader.hpp"
-#include "data_type.h"
-
-#include <arpa/inet.h>
-#include <cstring>
-#include <iostream>
-#include <limits>
-#include <stdexcept>
-#include <sys/socket.h>
-#include <unistd.h>
-#include <cmath>
-
-#ifndef M_PI
-static constexpr double M_PI = 3.14159265358979323846;
-#endif
-
-static constexpr int   BLOCKS_PER_SCAN   = 12;
-static constexpr int   POINTS_PER_BLOCK  = 16;
-static constexpr double INF_DIST         = std::numeric_limits<double>::infinity();
-
-LiDARReader::LiDARReader(const std::string& host_ip,
-                         int port,
-                         int angle_offset,
-                         bool inverted)
- : angle_offset_(angle_offset),
-   inverted_(inverted)
-{
-  setupSocket(host_ip, port);
-}
-
-LiDARReader::~LiDARReader() {
-  if (sockfd_ >= 0) close(sockfd_);
-}
-
-void LiDARReader::setupSocket(const std::string& host_ip, int port) {
-  sockfd_ = socket(AF_INET, SOCK_DGRAM, 0);
-  if (sockfd_ < 0)
-    throw std::runtime_error("socket() failed");
-
-  sockaddr_in addr{};
-  addr.sin_family      = AF_INET;
-  addr.sin_addr.s_addr = htonl(INADDR_ANY);
-  addr.sin_port        = htons(port);
-
-  if (bind(sockfd_, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) < 0)
-    throw std::runtime_error("bind() failed");
-}
-
-void LiDARReader::recvPacket(MSOP_Data_t& buf) {
-  sockaddr_in client{};
-  socklen_t   len = sizeof(client);
-  ssize_t     n   = recvfrom(sockfd_, &buf, sizeof(buf), 0,
-                             reinterpret_cast<sockaddr*>(&client), &len);
-  if (n < 0 || static_cast<size_t>(n) != sizeof(buf))
-    throw std::runtime_error("recvfrom error or incomplete packet");
-}
-
-std::vector<ScanPoint> LiDARReader::readScan() {
-  std::vector<ScanPoint> scan(BLOCKS_PER_SCAN * POINTS_PER_BLOCK);
-  MSOP_Data_t packet;
-
-  // 1) sync on block0
-  do {
-    recvPacket(packet);
-  } while (packet.BlockID[0].Azimuth != 0);
-
-  // convert block0 fields
-  packet.BlockID[0].DataFlag = ntohs(packet.BlockID[0].DataFlag);
-  packet.BlockID[0].Azimuth  = ntohs(packet.BlockID[0].Azimuth);
-  for(int i=0;i<POINTS_PER_BLOCK;i++){
-    packet.BlockID[0].Result[i].Dist_1 = ntohs(packet.BlockID[0].Result[i].Dist_1);
-    // RSSI_1 is a byte, no swap needed
-  }
-
-  double resolution = (packet.BlockID[1].Azimuth - packet.BlockID[0].Azimuth)
-                      / static_cast<double>(POINTS_PER_BLOCK);
-
-  // 2) read blocks 1..11
-  for (int b = 0; b < BLOCKS_PER_SCAN; ++b) {
-    if (b > 0) {
-      recvPacket(packet);
-      packet.BlockID[b].DataFlag = ntohs(packet.BlockID[b].DataFlag);
-      packet.BlockID[b].Azimuth  = ntohs(packet.BlockID[b].Azimuth);
-      for(int i=0;i<POINTS_PER_BLOCK;i++){
-        packet.BlockID[b].Result[i].Dist_1 = ntohs(packet.BlockID[b].Result[i].Dist_1);
-      }
-    }
-
-    for (int i = 0; i < POINTS_PER_BLOCK; ++i) {
-      auto &blk = packet.BlockID[b];
-      // Now DataFlag will read 0xEEFF correctly
-      //if (blk.DataFlag != 0xEEFF) continue;
-
-      double raw_ang = blk.Azimuth + resolution * i + angle_offset_;
-      double ang_rad = raw_ang * M_PI / 180.0;
-      double dist_m  = blk.Result[i].Dist_1 / 1000.0;
-      double inten   = blk.Result[i].RSSI_1;
-      if (dist_m <= 0) { dist_m = INF_DIST; inten = 0; }
-
-      int idx = b*POINTS_PER_BLOCK + i;
-      if (inverted_) idx = BLOCKS_PER_SCAN*POINTS_PER_BLOCK - 1 - idx;
-      scan[idx] = { ang_rad, dist_m, inten };
-    }
-  }
-
-  return scan;
-
-}
+savindu@savindu-Katana-GF66-11SC:~/LiDAR_Interface/slam_lidar_cpp/build$ make -j4
+[ 12%] Building CXX object CMakeFiles/lidar_reader.dir/src/lidar_reader.cpp.o
+[ 25%] Building CXX object CMakeFiles/read_packets.dir/src/read_packets.cpp.o
+/home/savindu/LiDAR_Interface/slam_lidar_cpp/src/lidar_reader.cpp: In member function ‘std::vector<ScanPoint> LiDARReader::readScan()’:
+/home/savindu/LiDAR_Interface/slam_lidar_cpp/src/lidar_reader.cpp:90:8: error: ‘array’ is not a member of ‘std’
+   90 |   std::array<decltype(packet.BlockID[0]), BLOCKS_PER_SCAN> blocks;
+      |        ^~~~~
+/home/savindu/LiDAR_Interface/slam_lidar_cpp/src/lidar_reader.cpp:14:1: note: ‘std::array’ is defined in header ‘<array>’; did you forget to ‘#include <array>’?
+   13 | #include <cmath>
+  +++ |+#include <array>
+   14 | 
+/home/savindu/LiDAR_Interface/slam_lidar_cpp/src/lidar_reader.cpp:90:14: error: expected primary-expression before ‘decltype’
+   90 |   std::array<decltype(packet.BlockID[0]), BLOCKS_PER_SCAN> blocks;
+      |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/savindu/LiDAR_Interface/slam_lidar_cpp/src/lidar_reader.cpp:91:3: error: ‘blocks’ was not declared in this scope; did you mean ‘lockf’?
+   91 |   blocks[0] = b0;
+      |   ^~~~~~
+      |   lockf
+make[2]: *** [CMakeFiles/lidar_reader.dir/build.make:76: CMakeFiles/lidar_reader.dir/src/lidar_reader.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:89: CMakeFiles/lidar_reader.dir/all] Error 2
+make[1]: *** Waiting for unfinished jobs....
+[ 37%] Linking CXX executable read_packets
+[ 37%] Built target read_packets
+make: *** [Makefile:91: all] Error 2
