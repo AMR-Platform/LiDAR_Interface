@@ -27,7 +27,6 @@ LiDARReader::LiDARReader(const std::string& /*host_ip*/,
   : angle_offset_(angle_offset),
     inverted_(inverted)
 {
-  // Create UDP socket and bind to all interfaces on the given port
   sockfd_ = socket(AF_INET, SOCK_DGRAM, 0);
   if (sockfd_ < 0) throw std::runtime_error("socket() failed");
 
@@ -59,49 +58,48 @@ void LiDARReader::recvPacket(MSOP_Data_t& buf) {
 }
 
 std::vector<ScanPoint> LiDARReader::readScan() {
-  // 1) Read exactly one MSOP packet (12 Data Blocks)
+  // 1) Read exactly one MSOP packet (all 12 blocks)
   MSOP_Data_t packet;
   recvPacket(packet);
 
-  // 2) Byte-swap and store all blocks
+  // 2) Byte-swap and stash each block
   Data_block blocks[BLOCKS_PER_SCAN];
   for (int b = 0; b < BLOCKS_PER_SCAN; ++b) {
     Data_block blk = packet.BlockID[b];
     blk.DataFlag = ntohs(blk.DataFlag);
     blk.Azimuth  = ntohs(blk.Azimuth);
-    for (int i = 0; i < POINTS_PER_BLOCK; ++i) {
+    for (int i = 0; i < POINTS_PER_BLOCK; ++i)
       blk.Result[i].Dist_1 = ntohs(blk.Result[i].Dist_1);
-    }
     blocks[b] = blk;
   }
 
-  // 3) Compute angular increment between points (degrees)
-  //    Handle wrap-around mod 36000 hundredths-of-degree
-  int raw0   = blocks[0].Azimuth;
-  int raw1   = blocks[1].Azimuth;
-  int diff100 = (raw1 - raw0 + 36000) % 36000;        // hundredths of degree
-  double step_deg = (diff100 / 100.0) / POINTS_PER_BLOCK;
+  // 3) Compute azimuth increment (in degrees) across a block,
+  //    accounting for wrap at 36000 (hundredths of a degree).
+  int raw0    = blocks[0].Azimuth;
+  int raw1    = blocks[1].Azimuth;
+  int diff100 = (raw1 - raw0 + 36000) % 36000;      // in hundredths
+  double step_deg = (diff100 / 100.0) / POINTS_PER_BLOCK;  // degrees
 
-  // 4) Prepare output vector
+  // 4) Allocate output (12×16 = 192 points)
   std::vector<ScanPoint> scan(BLOCKS_PER_SCAN * POINTS_PER_BLOCK);
 
-  // 5) Fill each beam
+  // 5) Fill in each beam
   for (int b = 0; b < BLOCKS_PER_SCAN; ++b) {
     const auto &blk = blocks[b];
     double base_deg = (blk.Azimuth / 100.0) + angle_offset_;
 
     for (int i = 0; i < POINTS_PER_BLOCK; ++i) {
-      // compute angle, wrap into [0,360)
+      // angle in degrees, wrapped to [0,360)
       double raw_deg = base_deg + step_deg * i;
       raw_deg = std::fmod(raw_deg, 360.0);
       if (raw_deg < 0) raw_deg += 360.0;
       double ang_rad = raw_deg * M_PI / 180.0;
 
-      // distance & intensity
+      // distance in meters
       double dist_m   = blk.Result[i].Dist_1 / 1000.0;
       double intensity = blk.Result[i].RSSI_1;
 
-      // filter invalid blocks or zero returns
+      // mark invalid if flag wrong or zero‐distance
       if (blk.DataFlag != 0xFFEE || dist_m <= 0) {
         dist_m    = INF_DIST;
         intensity = 0;
@@ -111,7 +109,6 @@ std::vector<ScanPoint> LiDARReader::readScan() {
       if (inverted_) {
         idx = BLOCKS_PER_SCAN * POINTS_PER_BLOCK - 1 - idx;
       }
-
       scan[idx] = { ang_rad, dist_m, intensity };
     }
   }
