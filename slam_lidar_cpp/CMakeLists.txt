@@ -23,4 +23,10 @@ add_executable(read_packets
 target_link_libraries(read_packets
   # no extra libs needed
 )
+add_executable(test_full_scan
+  src/test_full_scan.cpp
+)
+target_link_libraries(test_full_scan
+  lidar_reader
+)
 
