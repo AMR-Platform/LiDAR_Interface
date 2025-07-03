@@ -1,5 +1,4 @@
-// src/lidar_reader.cpp
-
+// lidar_reader.cpp
 #include "lidar_reader.hpp"
 #include "data_type.h"
 
@@ -10,6 +9,7 @@
 #include <stdexcept>
 #include <limits>
 #include <cmath>
+#include <vector>
 
 #ifndef M_PI
 static constexpr double M_PI = 3.14159265358979323846;
@@ -26,30 +26,22 @@ LiDARReader::LiDARReader(const std::string& /*host_ip*/,
   : angle_offset_(angle_offset),
     inverted_(inverted)
 {
-  setupSocket(port);
-}
-
-LiDARReader::~LiDARReader() {
-  if (sockfd_ >= 0) close(sockfd_);
-}
-
-void LiDARReader::setupSocket(int port) {
+  // bind to ANY address on the given UDP port
   sockfd_ = socket(AF_INET, SOCK_DGRAM, 0);
-  if (sockfd_ < 0)
-    throw std::runtime_error("socket() failed");
+  if (sockfd_ < 0) throw std::runtime_error("socket() failed");
 
   int yes = 1;
   setsockopt(sockfd_, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
-
   sockaddr_in addr{};
   addr.sin_family      = AF_INET;
   addr.sin_addr.s_addr = htonl(INADDR_ANY);
   addr.sin_port        = htons(port);
-
-  if (bind(sockfd_,
-           reinterpret_cast<sockaddr*>(&addr),
-           sizeof(addr)) < 0)
+  if (bind(sockfd_, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) < 0)
     throw std::runtime_error("bind() failed");
+}
+
+LiDARReader::~LiDARReader() {
+  if (sockfd_ >= 0) close(sockfd_);
 }
 
 void LiDARReader::recvPacket(MSOP_Data_t& buf) {
@@ -62,49 +54,42 @@ void LiDARReader::recvPacket(MSOP_Data_t& buf) {
 }
 
 std::vector<ScanPoint> LiDARReader::readScan() {
+  // container for 12*16 = 192 points
   std::vector<ScanPoint> scan(BLOCKS_PER_SCAN * POINTS_PER_BLOCK);
-  MSOP_Data_t packet;
 
-  // 1) Read two blocks to get angular step
-  recvPacket(packet);
-  Data_block b0 = packet.BlockID[0];
-  b0.DataFlag = ntohs(b0.DataFlag);
-  b0.Azimuth  = ntohs(b0.Azimuth);
-  for (int i = 0; i < POINTS_PER_BLOCK; ++i)
-    b0.Result[i].Dist_1 = ntohs(b0.Result[i].Dist_1);
-
-  recvPacket(packet);
-  Data_block b1 = packet.BlockID[1];
-  b1.DataFlag = ntohs(b1.DataFlag);
-  b1.Azimuth  = ntohs(b1.Azimuth);
-  for (int i = 0; i < POINTS_PER_BLOCK; ++i)
-    b1.Result[i].Dist_1 = ntohs(b1.Result[i].Dist_1);
-
-  double az0_deg  = b0.Azimuth / 100.0;
-  double az1_deg  = b1.Azimuth / 100.0;
-  double step_deg = (az1_deg - az0_deg) / POINTS_PER_BLOCK;
-
-  // 2) Collect all 12 blocks
+  // 1) Read all 12 blocks into an array
   Data_block blocks[BLOCKS_PER_SCAN];
-  blocks[0] = b0;
-  blocks[1] = b1;
-  for (int b = 2; b < BLOCKS_PER_SCAN; ++b) {
+  for (int b = 0; b < BLOCKS_PER_SCAN; ++b) {
+    MSOP_Data_t packet;
     recvPacket(packet);
-    Data_block blk = packet.BlockID[b];
+    // byte‐swap the header
+    auto blk = packet.BlockID[b];
     blk.DataFlag = ntohs(blk.DataFlag);
     blk.Azimuth  = ntohs(blk.Azimuth);
+    // byte‐swap each distance
     for (int i = 0; i < POINTS_PER_BLOCK; ++i)
       blk.Result[i].Dist_1 = ntohs(blk.Result[i].Dist_1);
     blocks[b] = blk;
   }
 
-  // 3) Parse into ScanPoint
-  for (int b = 0; b < BLOCKS_PER_SCAN; ++b) {
-    const Data_block &blk = blocks[b];
-    double base_deg = blk.Azimuth / 100.0 + angle_offset_;
+  // 2) Compute angular step *per block* in degrees
+  //    (Azimuth fields are in hundredths of a degree)
+  double step_deg[BLOCKS_PER_SCAN];
+  for (int b = 0; b < BLOCKS_PER_SCAN - 1; ++b) {
+    double a0 = blocks[b].Azimuth   / 100.0;
+    double a1 = blocks[b+1].Azimuth / 100.0;
+    step_deg[b] = (a1 - a0) / POINTS_PER_BLOCK;
+  }
+  // for the last block, reuse the previous block’s step
+  step_deg[BLOCKS_PER_SCAN - 1] = step_deg[BLOCKS_PER_SCAN - 2];
 
+  // 3) Fill the scan vector
+  for (int b = 0; b < BLOCKS_PER_SCAN; ++b) {
+    const auto &blk = blocks[b];
+    // base angle in degrees
+    double base_deg = blk.Azimuth / 100.0 + angle_offset_;
     for (int i = 0; i < POINTS_PER_BLOCK; ++i) {
-      double raw_deg = base_deg + step_deg * i;
+      double raw_deg = base_deg + step_deg[b] * i;
       double ang_rad = raw_deg * M_PI / 180.0;
 
       double dist_m = blk.Result[i].Dist_1 / 1000.0;
