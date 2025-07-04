@@ -74,7 +74,7 @@ private:
 void printPacketInfo(const std::vector<LidarPoint>& points, uint32_t timestamp, uint16_t factory_info) {
     std::cout << "Timestamp: " << timestamp << " μs, Factory: 0x" 
               << std::hex << factory_info << std::dec 
-              << ", Points: " << points.size() << std::endl;
+              << ", Points: " << points.size() << " (270° FOV: 45°-315°, Max: 15m)" << std::endl;
     
     // Print first few points as examples
     for (size_t i = 0; i < std::min(points.size(), size_t(5)); ++i) {
@@ -100,6 +100,7 @@ int main() {
     }
     
     std::cout << "Listening for MSOP packets on port 2368..." << std::endl;
+    std::cout << "LakiBeam1(L) - 270° Field of View (45° to 315°)" << std::endl;
     std::cout << "Press Ctrl+C to exit" << std::endl;
     
     uint8_t buffer[2048];  // Buffer for received packets
@@ -121,6 +122,23 @@ int main() {
             
             if (parser.parsePacket(buffer, received_size, points)) {
                 printPacketInfo(points, parser.getLastTimestamp(), parser.getLastFactoryInfo());
+                
+                // Show range statistics for first few packets
+                if (packet_count <= 5 && !points.empty()) {
+                    float min_dist = 999.0f, max_dist = 0.0f;
+                    float min_azim = 999.0f, max_azim = 0.0f;
+                    
+                    for (const auto& point : points) {
+                        min_dist = std::min(min_dist, point.distance);
+                        max_dist = std::max(max_dist, point.distance);
+                        min_azim = std::min(min_azim, point.azimuth);
+                        max_azim = std::max(max_azim, point.azimuth);
+                    }
+                    
+                    std::cout << "  Range stats: Distance " << std::fixed << std::setprecision(2) 
+                              << min_dist << "m to " << max_dist << "m, "
+                              << "Azimuth " << min_azim << "° to " << max_azim << "°" << std::endl;
+                }
             } else {
                 std::cout << "Failed to parse MSOP packet" << std::endl;
             }

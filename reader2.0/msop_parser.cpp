@@ -52,10 +52,14 @@ bool MSOPParser::parsePacket(const uint8_t* data, size_t size, std::vector<Lidar
                 LidarPoint point;
                 point.azimuth = calculateAzimuth(current_azimuth, next_azimuth, meas_idx);
                 point.distance = distance_strongest / 1000.0f;  // Convert mm to meters
-                point.rssi = measurement->rssi_strongest;
-                point.is_valid = true;
-                point.is_strongest = true;
-                points.push_back(point);
+                
+                // Validate both azimuth and distance are within realistic ranges
+                if (isValidAzimuth(point.azimuth) && isValidDistance(point.distance)) {
+                    point.rssi = measurement->rssi_strongest;
+                    point.is_valid = true;
+                    point.is_strongest = true;
+                    points.push_back(point);
+                }
             }
             
             // Parse last return (if different from strongest)
@@ -65,10 +69,14 @@ bool MSOPParser::parsePacket(const uint8_t* data, size_t size, std::vector<Lidar
                 LidarPoint point;
                 point.azimuth = calculateAzimuth(current_azimuth, next_azimuth, meas_idx);
                 point.distance = distance_last / 1000.0f;  // Convert mm to meters
-                point.rssi = measurement->rssi_last;
-                point.is_valid = true;
-                point.is_strongest = false;
-                points.push_back(point);
+                
+                // Validate both azimuth and distance are within realistic ranges
+                if (isValidAzimuth(point.azimuth) && isValidDistance(point.distance)) {
+                    point.rssi = measurement->rssi_last;
+                    point.is_valid = true;
+                    point.is_strongest = false;
+                    points.push_back(point);
+                }
             }
         }
     }
@@ -99,20 +107,30 @@ float MSOPParser::calculateAzimuth(uint16_t block_azimuth, uint16_t next_block_a
     float current_angle = block_azimuth / 100.0f;  // Convert to degrees
     float next_angle = next_block_azimuth / 100.0f;
     
-    // Handle angle wraparound (360° -> 0°)
+    // LakiBeam1(L) has 270° field of view: 45° to 315°
+    // Handle angle calculation for 270° scanning range
     float angle_diff = next_angle - current_angle;
-    if (angle_diff < -180.0f) {
-        angle_diff += 360.0f;
-    } else if (angle_diff > 180.0f) {
-        angle_diff -= 360.0f;
+    
+    // For 270° lidar, we don't expect wraparound from 315° to 45°
+    // If we see a large negative difference, it might be end-of-scan to start-of-scan
+    // In this case, don't interpolate - use current block angle
+    if (angle_diff < -200.0f) {
+        // Likely jumped from end of scan (~315°) to start of scan (~45°)
+        // Don't interpolate across this gap
+        return current_angle;
+    } else if (angle_diff > 200.0f) {
+        // Unlikely but handle reverse case
+        return current_angle;
     }
     
-    // Calculate interpolated angle for this measurement
+    // Normal case: interpolate within the scanning direction
     float interpolated_angle = current_angle + (angle_diff / 16.0f) * measurement_index;
     
-    // Normalize to 0-360 range
-    while (interpolated_angle < 0.0f) interpolated_angle += 360.0f;
-    while (interpolated_angle >= 360.0f) interpolated_angle -= 360.0f;
+    // Validate that the angle is within expected range (45° to 315°)
+    if (interpolated_angle < 45.0f || interpolated_angle > 315.0f) {
+        // If interpolation results in invalid angle, use block angle
+        return current_angle;
+    }
     
     return interpolated_angle;
 }
@@ -122,5 +140,39 @@ bool MSOPParser::isValidDataBlock(const DataBlock* block) const {
     uint16_t azimuth = be16ToHost(block->azimuth);
     
     // Valid blocks should have flag 0xFFEE and azimuth != 0xFFFF
-    return (flag == 0xFFEE) && (azimuth != 0xFFFF);
+    if (flag != 0xFFEE || azimuth == 0xFFFF) {
+        return false;
+    }
+    
+    // Check if azimuth is within the 270° scanning range
+    float angle_degrees = azimuth / 100.0f;
+    if (!isValidAzimuth(angle_degrees)) {
+        return false;
+    }
+    
+    // Additional validation: check if at least some measurements in the block are valid
+    int valid_measurements = 0;
+    for (int i = 0; i < 16; ++i) {
+        uint16_t distance_strongest = be16ToHost(block->measurements[i].distance_strongest);
+        uint16_t distance_last = be16ToHost(block->measurements[i].distance_last);
+        
+        if ((distance_strongest != 0 && distance_strongest != 0xFFFF) ||
+            (distance_last != 0 && distance_last != 0xFFFF)) {
+            valid_measurements++;
+        }
+    }
+    
+    // At least a few measurements should be valid for a good data block
+    return valid_measurements > 0;
+}
+
+bool MSOPParser::isValidAzimuth(float azimuth) const {
+    // LakiBeam1(L) has 270° field of view: 45° to 315°
+    return (azimuth >= 45.0f && azimuth <= 315.0f);
+}
+
+bool MSOPParser::isValidDistance(float distance) const {
+    // LakiBeam1(L) has maximum range of 15 meters
+    // Minimum range is typically 0.1m to avoid noise
+    return (distance >= 0.1f && distance <= 15.0f);
 }

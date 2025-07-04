@@ -4,7 +4,7 @@ This project provides a C++ implementation for reading and parsing MSOP (Main St
 
 ## Overview
 
-The MSOP protocol is used for lidar data transmission over UDP on port 2368. Each packet contains:
+The MSOP protocol is used for lidar data transmission over UDP on port 2368. The LakiBeam1(L) has a **270° field of view**, scanning from **45° to 315°**. Each packet contains:
 - 12 data blocks (100 bytes each)
 - Each data block contains 16 measurement results
 - Each measurement has both strongest and last return data
@@ -29,10 +29,11 @@ MSOP Packet (1206 bytes without UDP header):
 
 - **Real-time UDP packet reception** on port 2368
 - **MSOP packet parsing** with proper big-endian byte order handling
-- **Azimuth interpolation** for accurate angular positioning
+- **270° field of view support** (45° to 315° scanning range)
+- **Azimuth interpolation** for accurate angular positioning within valid range
 - **Dual return processing** (strongest and last returns)
 - **Invalid data detection** for last packets in rotation
-- **Point cloud data extraction** with validation
+- **Point cloud data extraction** with azimuth validation
 
 ## Building
 
@@ -78,7 +79,8 @@ Example output:
 --- Packet 1 ---
 Received 1206 bytes
 MSOP packet detected (1206 bytes - UDP header stripped)
-Timestamp: 245899399 μs, Factory: 0x3740, Points: 192
+LakiBeam1(L) - 270° Field of View (45° to 315°)
+Timestamp: 245899399 μs, Factory: 0x3740, Points: 192 (270° FOV: 45°-315°)
   Point 0: Azimuth=96.00°, Distance=2.300m, RSSI=49 (strongest)
   Point 1: Azimuth=96.25°, Distance=2.350m, RSSI=52 (strongest)
   ...
@@ -96,15 +98,18 @@ Timestamp: 245899399 μs, Factory: 0x3740, Points: 192
 All multi-byte values in MSOP packets use big-endian byte order and are converted to host byte order during parsing.
 
 ### Azimuth Calculation
-The azimuth for each measurement point is interpolated within each data block:
+The azimuth for each measurement point is interpolated within each data block, but only for angles within the valid 270° range (45° to 315°):
 ```cpp
 azimuth_n = block_azimuth + (angle_increment / 16) × n
+// Only if 45° ≤ azimuth_n ≤ 315°
 ```
 
 ### Data Validation
 - Checks for valid flag bytes (0xFFEE for normal blocks, 0xFFFF for invalid)
 - Validates distance values (non-zero, not 0xFFFF)
-- Handles last packet detection with invalid data blocks
+- **Validates azimuth angles** (must be between 45° and 315°)
+- Handles scanning direction changes without invalid interpolation
+- Detects last packet with invalid data blocks
 
 ## Troubleshooting
 

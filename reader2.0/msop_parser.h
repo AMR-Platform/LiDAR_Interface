@@ -72,6 +72,12 @@ private:
     // Validate data block
     bool isValidDataBlock(const DataBlock* block) const;
     
+    // Check if azimuth is within valid 270° range (45° to 315°)
+    bool isValidAzimuth(float azimuth) const;
+    
+    // Check if distance is within valid range (0.1m to 15m)
+    bool isValidDistance(float distance) const;
+    
     uint32_t last_timestamp_;
     uint16_t last_factory_info_;
 };
