@@ -83,7 +83,7 @@ void printPacketInfo(const std::vector<LidarPoint>& points, uint32_t timestamp, 
     for (const auto& point : points) {
         if (point.is_valid && 
             point.distance > 0.1f && point.distance < 13.0f &&
-            point.rssi > 20) {  // Same filtering as visualizer
+            point.rssi > 25) {  // Higher threshold accounting for LV3 hardware filtering
             reliable_points++;
             if (filtered_points.size() < 5) {
                 filtered_points.push_back(point);

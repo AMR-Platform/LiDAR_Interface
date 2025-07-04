@@ -28,6 +28,7 @@ MSOP Packet (1206 bytes without UDP header):
 ## Features
 
 - **Real-time UDP packet reception** on port 2368
+- **Hardware-aware filtering** (calibrated for LV3 filter level)
 - **MSOP packet parsing** with proper big-endian byte order handling
 - **Accurate azimuth calculation** matching ROS2 driver implementation
 - **270° field of view support** (45° to 315° scanning range)
@@ -144,16 +145,20 @@ The parser implements multi-level filtering to ensure data quality:
 - Filters out zero or invalid distances
 
 **2. Signal Strength Filtering:**
-- RSSI threshold > 20 for general use
-- RSSI threshold > 25 for multi-sample validation
-- RSSI threshold > 35 for single-sample acceptance
-- These thresholds help filter out weak reflections from hands, glass, or other poor reflectors
+- RSSI threshold > 15 for initial collection
+- RSSI threshold > 20-25 for final acceptance (accounting for LV3 hardware filtering)
+- RSSI threshold > 25 for single-sample acceptance
+- These thresholds are calibrated for LV3 hardware filter level on the lidar
+- Higher thresholds help filter out weak reflections from hands, glass, or other poor reflectors
 
 **3. Multi-Sample Validation (Visualizer):**
-- Collects multiple samples per 0.5° angle bin
-- Requires sample consistency (all samples within 20% of mean distance)
-- Selects the sample with strongest RSSI as the representative point
-- This approach eliminates spurious readings from weak reflections
+- Collects multiple samples per 0.5° angle bin over 150 packets (3 rounds of 50)
+- Uses median-based filtering to handle outliers robustly:
+  - **3+ samples**: Calculates median distance/RSSI, filters outliers beyond 50% deviation
+  - **2 samples**: Accepts if distance difference < 30% and min RSSI > 15
+  - **1 sample**: Accepts if RSSI > 20
+- Selects the most representative point (closest to median with good RSSI)
+- This approach is more robust than strict consistency checks and handles dynamic environments
 - **Improved azimuth processing** matching ROS2 driver behavior
 - Handles scanning direction changes properly
 
@@ -168,8 +173,9 @@ The parser implements multi-level filtering to ensure data quality:
 
 **"Getting readings at 15m when blocking with hand"**
 - This is normal behavior - weak reflections from your hand
-- The improved filtering now rejects these (RSSI > 20-35 depending on mode)
+- The improved filtering now rejects these with RSSI thresholds calibrated for LV3 hardware filtering
 - Use `lidar_visualizer` for best filtering with multi-sample validation
+- If still seeing issues, consider increasing lidar's hardware filter level to LV4 or LV5
 
 **Permission denied**
 - Run with `sudo` for UDP port access: `sudo ./lidar_reader`

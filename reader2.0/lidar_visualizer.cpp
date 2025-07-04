@@ -187,8 +187,8 @@ int main() {
     
     std::cout << "Collecting lidar data for visualization..." << std::endl;
     std::cout << "LakiBeam1(L): 10Hz frequency, 0.5° resolution" << std::endl;
-    std::cout << "Will collect multiple samples per angle bin for reliability" << std::endl;
-    std::cout << "Will collect 100 packets with RSSI filtering" << std::endl;
+    std::cout << "Will collect multiple samples per angle bin for median filtering" << std::endl;
+    std::cout << "Will collect 150 packets in 3 rounds of 50 packets each" << std::endl;
     std::cout << "Press Ctrl+C to stop early" << std::endl;
     
     uint8_t buffer[2048];
@@ -204,7 +204,8 @@ int main() {
     std::map<int, AngleSamples> angle_map;  // Key: angle * 2 (for 0.5° bins)
     
     int packet_count = 0;
-    const int max_packets = 100;  // More packets for better sampling
+    const int max_packets = 150;  // More packets for better statistical sampling
+    const int packets_per_round = 50;  // Collect in rounds for dynamic environments
     
     while (packet_count < max_packets) {
         size_t received_size;
@@ -213,8 +214,11 @@ int main() {
         }
         
         packet_count++;
-        std::cout << "\rPacket " << packet_count << "/" << max_packets 
-                  << " (Unique angles: " << angle_map.size() << ")" << std::flush;
+        int current_round = (packet_count - 1) / packets_per_round + 1;
+        int packet_in_round = ((packet_count - 1) % packets_per_round) + 1;
+        
+        std::cout << "\rRound " << current_round << "/3 - Packet " << packet_in_round 
+                  << "/" << packets_per_round << " (Angles: " << angle_map.size() << ")" << std::flush;
         
         if (received_size == 1206 || received_size == 1248) {
             std::vector<LidarPoint> points;
@@ -224,11 +228,11 @@ int main() {
             if (parser.parsePacket(data, data_size, points)) {
                 // Process each point and collect multiple samples per angle bin
                 for (const auto& point : points) {
-                    // Enhanced filtering for reliable measurements
-                    // Use stricter thresholds to filter out weak reflections from hands/objects
+                    // More lenient initial filtering - just basic validity checks
+                    // Note: Lidar is set to LV3 filter level, so some weak signals still pass through
                     if (point.is_valid && 
-                        point.distance > 0.1f && point.distance < 13.0f &&  // Reduced max range
-                        point.rssi > 20) {  // Increased RSSI threshold to filter weak reflections
+                        point.distance > 0.1f && point.distance < 14.0f &&  // Back to 14m range
+                        point.rssi > 15) {  // Slightly higher RSSI threshold due to LV3 hardware filtering
                         
                         // Create angle bin key (0.5° resolution)
                         int angle_bin = static_cast<int>(point.azimuth * 2.0f);
@@ -242,7 +246,7 @@ int main() {
     }
     
     std::cout << "\nCollected " << angle_map.size() << " unique angle measurements" << std::endl;
-    std::cout << "Processing samples and selecting best points..." << std::endl;
+    std::cout << "Processing samples with median-based filtering..." << std::endl;
     
     if (!angle_map.empty()) {
         // Convert map to vector, selecting best point from samples
@@ -250,45 +254,73 @@ int main() {
         unique_points.reserve(angle_map.size());
         
         int filtered_bins = 0;
+        int total_samples = 0;
+        
         for (const auto& pair : angle_map) {
             const auto& samples = pair.second.samples;
+            total_samples += samples.size();
             
-            // Require at least 2 consistent samples for reliability
-            if (samples.size() >= 2) {
-                // Calculate statistics for this angle bin
-                float mean_distance = 0.0f;
-                float mean_rssi = 0.0f;
+            if (samples.size() >= 3) {
+                // Multiple samples: use median-based filtering for robustness
+                std::vector<float> distances, rssi_values;
                 for (const auto& sample : samples) {
-                    mean_distance += sample.distance;
-                    mean_rssi += sample.rssi;
+                    distances.push_back(sample.distance);
+                    rssi_values.push_back(sample.rssi);
                 }
-                mean_distance /= samples.size();
-                mean_rssi /= samples.size();
                 
-                // Check for consistency: all samples should be within 20% of mean distance
-                bool consistent = true;
+                // Sort for median calculation
+                std::sort(distances.begin(), distances.end());
+                std::sort(rssi_values.begin(), rssi_values.end());
+                
+                // Calculate medians
+                float median_distance = distances[distances.size() / 2];
+                float median_rssi = rssi_values[rssi_values.size() / 2];
+                
+                // Filter out obvious outliers (beyond 50% of median)
+                std::vector<LidarPoint> filtered_samples;
                 for (const auto& sample : samples) {
-                    float distance_deviation = std::abs(sample.distance - mean_distance) / mean_distance;
-                    if (distance_deviation > 0.20f) {  // 20% tolerance
-                        consistent = false;
-                        break;
+                    float distance_deviation = std::abs(sample.distance - median_distance) / median_distance;
+                    if (distance_deviation <= 0.50f && sample.rssi >= median_rssi * 0.7f) {
+                        filtered_samples.push_back(sample);
                     }
                 }
                 
-                if (consistent && mean_rssi > 25) {  // Higher RSSI threshold for reliable points
-                    // Find the sample with the strongest signal (highest RSSI)
-                    auto best_sample = *std::max_element(samples.begin(), samples.end(),
-                        [](const LidarPoint& a, const LidarPoint& b) {
-                            return a.rssi < b.rssi;
+                if (!filtered_samples.empty() && median_rssi > 20) {  // Higher threshold for LV3 filtered data
+                    // Select the sample closest to median distance with good RSSI
+                    auto best_sample = *std::min_element(filtered_samples.begin(), filtered_samples.end(),
+                        [median_distance](const LidarPoint& a, const LidarPoint& b) {
+                            float diff_a = std::abs(a.distance - median_distance);
+                            float diff_b = std::abs(b.distance - median_distance);
+                            if (std::abs(diff_a - diff_b) < 0.1f) {
+                                return a.rssi > b.rssi;  // If distances similar, prefer higher RSSI
+                            }
+                            return diff_a < diff_b;
                         });
                     
                     unique_points.push_back(best_sample);
                 } else {
                     filtered_bins++;
                 }
-            } else {
-                // Single sample - require higher RSSI for acceptance
-                if (!samples.empty() && samples[0].rssi > 35) {
+                
+            } else if (samples.size() == 2) {
+                // Two samples: check if they're reasonably consistent
+                float distance_diff = std::abs(samples[0].distance - samples[1].distance);
+                float avg_distance = (samples[0].distance + samples[1].distance) / 2.0f;
+                float relative_diff = distance_diff / avg_distance;
+                
+                if (relative_diff <= 0.30f && 
+                    std::min(samples[0].rssi, samples[1].rssi) > 20) {  // Higher threshold for LV3 data
+                    // Use the sample with higher RSSI
+                    auto best_sample = (samples[0].rssi > samples[1].rssi) ? samples[0] : samples[1];
+                    unique_points.push_back(best_sample);
+                } else {
+                    filtered_bins++;
+                }
+                
+            } else if (samples.size() == 1) {
+                // Single sample: be more accepting but require decent RSSI
+                // With LV3 hardware filtering, we can be more confident in single samples
+                if (samples[0].rssi > 25) {  // Higher threshold for single samples with LV3
                     unique_points.push_back(samples[0]);
                 } else {
                     filtered_bins++;
@@ -296,8 +328,20 @@ int main() {
             }
         }
         
+        std::cout << "Total samples collected: " << total_samples << std::endl;
         std::cout << "Filtered out " << filtered_bins << " unreliable angle bins" << std::endl;
         std::cout << "Keeping " << unique_points.size() << " reliable measurements" << std::endl;
+        
+        // Show some statistics about the filtering
+        int multi_sample_bins = 0, two_sample_bins = 0, single_sample_bins = 0;
+        for (const auto& pair : angle_map) {
+            if (pair.second.samples.size() >= 3) multi_sample_bins++;
+            else if (pair.second.samples.size() == 2) two_sample_bins++;
+            else single_sample_bins++;
+        }
+        
+        std::cout << "Sample distribution: " << multi_sample_bins << " multi-sample, " 
+                  << two_sample_bins << " two-sample, " << single_sample_bins << " single-sample bins" << std::endl;
         
         // Sort by azimuth for cleaner output
         std::sort(unique_points.begin(), unique_points.end(), 
