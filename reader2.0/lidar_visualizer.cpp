@@ -186,17 +186,25 @@ int main() {
     }
     
     std::cout << "Collecting lidar data for visualization..." << std::endl;
-    std::cout << "Will collect one point per angle (0.1° resolution)" << std::endl;
-    std::cout << "Will collect 200 packets to ensure full 270° coverage" << std::endl;
+    std::cout << "LakiBeam1(L): 10Hz frequency, 0.5° resolution" << std::endl;
+    std::cout << "Will collect multiple samples per angle bin for reliability" << std::endl;
+    std::cout << "Will collect 100 packets with RSSI filtering" << std::endl;
     std::cout << "Press Ctrl+C to stop early" << std::endl;
     
     uint8_t buffer[2048];
     
-    // Use a map to store one point per angle bin (0.1° resolution)
-    std::map<int, LidarPoint> angle_map;  // Key: angle * 10 (for 0.1° bins)
+    // Structure to store multiple samples per angle
+    struct AngleSamples {
+        std::vector<LidarPoint> samples;
+        LidarPoint best_point;
+        bool has_valid_point = false;
+    };
+    
+    // Use a map to store multiple samples per 0.5° angle bin
+    std::map<int, AngleSamples> angle_map;  // Key: angle * 2 (for 0.5° bins)
     
     int packet_count = 0;
-    const int max_packets = 200;  // More packets to ensure full coverage
+    const int max_packets = 100;  // More packets for better sampling
     
     while (packet_count < max_packets) {
         size_t received_size;
@@ -214,18 +222,19 @@ int main() {
             size_t data_size = (received_size == 1248) ? received_size - 42 : received_size;
             
             if (parser.parsePacket(data, data_size, points)) {
-                // Process each point and keep only one per angle bin
+                // Process each point and collect multiple samples per angle bin
                 for (const auto& point : points) {
-                    if (point.is_valid && point.distance > 0.1f && point.distance < 15.0f) {
-                        // Create angle bin key (0.1° resolution)
-                        int angle_bin = static_cast<int>(point.azimuth * 10.0f);
+                    // Enhanced filtering for reliable measurements
+                    // Use stricter thresholds to filter out weak reflections from hands/objects
+                    if (point.is_valid && 
+                        point.distance > 0.1f && point.distance < 13.0f &&  // Reduced max range
+                        point.rssi > 20) {  // Increased RSSI threshold to filter weak reflections
                         
-                        // Only keep the point if we don't have one for this angle,
-                        // or if this point has better RSSI (stronger signal)
-                        auto it = angle_map.find(angle_bin);
-                        if (it == angle_map.end() || point.rssi > it->second.rssi) {
-                            angle_map[angle_bin] = point;
-                        }
+                        // Create angle bin key (0.5° resolution)
+                        int angle_bin = static_cast<int>(point.azimuth * 2.0f);
+                        
+                        // Store multiple samples for this angle
+                        angle_map[angle_bin].samples.push_back(point);
                     }
                 }
             }
@@ -233,15 +242,62 @@ int main() {
     }
     
     std::cout << "\nCollected " << angle_map.size() << " unique angle measurements" << std::endl;
+    std::cout << "Processing samples and selecting best points..." << std::endl;
     
     if (!angle_map.empty()) {
-        // Convert map to vector for saving
+        // Convert map to vector, selecting best point from samples
         std::vector<LidarPoint> unique_points;
         unique_points.reserve(angle_map.size());
         
+        int filtered_bins = 0;
         for (const auto& pair : angle_map) {
-            unique_points.push_back(pair.second);
+            const auto& samples = pair.second.samples;
+            
+            // Require at least 2 consistent samples for reliability
+            if (samples.size() >= 2) {
+                // Calculate statistics for this angle bin
+                float mean_distance = 0.0f;
+                float mean_rssi = 0.0f;
+                for (const auto& sample : samples) {
+                    mean_distance += sample.distance;
+                    mean_rssi += sample.rssi;
+                }
+                mean_distance /= samples.size();
+                mean_rssi /= samples.size();
+                
+                // Check for consistency: all samples should be within 20% of mean distance
+                bool consistent = true;
+                for (const auto& sample : samples) {
+                    float distance_deviation = std::abs(sample.distance - mean_distance) / mean_distance;
+                    if (distance_deviation > 0.20f) {  // 20% tolerance
+                        consistent = false;
+                        break;
+                    }
+                }
+                
+                if (consistent && mean_rssi > 25) {  // Higher RSSI threshold for reliable points
+                    // Find the sample with the strongest signal (highest RSSI)
+                    auto best_sample = *std::max_element(samples.begin(), samples.end(),
+                        [](const LidarPoint& a, const LidarPoint& b) {
+                            return a.rssi < b.rssi;
+                        });
+                    
+                    unique_points.push_back(best_sample);
+                } else {
+                    filtered_bins++;
+                }
+            } else {
+                // Single sample - require higher RSSI for acceptance
+                if (!samples.empty() && samples[0].rssi > 35) {
+                    unique_points.push_back(samples[0]);
+                } else {
+                    filtered_bins++;
+                }
+            }
         }
+        
+        std::cout << "Filtered out " << filtered_bins << " unreliable angle bins" << std::endl;
+        std::cout << "Keeping " << unique_points.size() << " reliable measurements" << std::endl;
         
         // Sort by azimuth for cleaner output
         std::sort(unique_points.begin(), unique_points.end(), 
@@ -259,8 +315,12 @@ int main() {
         float angle_span = max_angle - min_angle;
         
         std::cout << "\nData collection complete!" << std::endl;
+        std::cout << "Expected angles for 270° FOV at 0.5° resolution: " << (270.0f / 0.5f) << " points" << std::endl;
+        std::cout << "Actual coverage: " << unique_points.size() << " points" << std::endl;
         std::cout << "Angle coverage: " << std::fixed << std::setprecision(1) 
                   << min_angle << "° to " << max_angle << "° (span: " << angle_span << "°)" << std::endl;
+        std::cout << "Average angular resolution: " << std::setprecision(2) 
+                  << (angle_span / (unique_points.size() - 1)) << "° per point" << std::endl;
         std::cout << "Files created:" << std::endl;
         std::cout << "- " << csv_filename << " (scan line data)" << std::endl;
         std::cout << "- visualize_lidar.py (visualization script)" << std::endl;

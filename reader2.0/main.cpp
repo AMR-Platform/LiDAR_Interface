@@ -76,9 +76,27 @@ void printPacketInfo(const std::vector<LidarPoint>& points, uint32_t timestamp, 
               << std::hex << factory_info << std::dec 
               << ", Points: " << points.size() << " (270° FOV: 45°-315°, Max: 15m)" << std::endl;
     
-    // Print first few points as examples
-    for (size_t i = 0; i < std::min(points.size(), size_t(5)); ++i) {
-        const auto& point = points[i];
+    // Filter and count reliable points
+    int reliable_points = 0;
+    std::vector<LidarPoint> filtered_points;
+    
+    for (const auto& point : points) {
+        if (point.is_valid && 
+            point.distance > 0.1f && point.distance < 13.0f &&
+            point.rssi > 20) {  // Same filtering as visualizer
+            reliable_points++;
+            if (filtered_points.size() < 5) {
+                filtered_points.push_back(point);
+            }
+        }
+    }
+    
+    std::cout << "  Reliable points (RSSI>20, distance<13m): " << reliable_points 
+              << "/" << points.size() << std::endl;
+    
+    // Print first few reliable points as examples
+    for (size_t i = 0; i < filtered_points.size(); ++i) {
+        const auto& point = filtered_points[i];
         std::cout << "  Point " << i << ": "
                   << "Azimuth=" << std::fixed << std::setprecision(2) << point.azimuth << "°, "
                   << "Distance=" << std::setprecision(3) << point.distance << "m, "
@@ -86,8 +104,8 @@ void printPacketInfo(const std::vector<LidarPoint>& points, uint32_t timestamp, 
                   << " (" << (point.is_strongest ? "strongest" : "last") << ")"
                   << std::endl;
     }
-    if (points.size() > 5) {
-        std::cout << "  ... and " << (points.size() - 5) << " more points" << std::endl;
+    if (reliable_points > 5) {
+        std::cout << "  ... and " << (reliable_points - 5) << " more reliable points" << std::endl;
     }
 }
 

@@ -136,8 +136,24 @@ azimuth_degrees = calculated_azimuth / 100.0f;
 This fixes the issue where angles appeared only in multiples of 82°. The resolution is now calculated dynamically for each packet pair, providing smooth, continuous angle coverage.
 
 ### Data Validation
+The parser implements multi-level filtering to ensure data quality:
+
+**1. Basic Validation:**
 - Checks for valid flag bytes (0xFFEE for normal blocks, 0xFFFF for invalid)
 - Validates distance values (0.1m to 15m range)
+- Filters out zero or invalid distances
+
+**2. Signal Strength Filtering:**
+- RSSI threshold > 20 for general use
+- RSSI threshold > 25 for multi-sample validation
+- RSSI threshold > 35 for single-sample acceptance
+- These thresholds help filter out weak reflections from hands, glass, or other poor reflectors
+
+**3. Multi-Sample Validation (Visualizer):**
+- Collects multiple samples per 0.5° angle bin
+- Requires sample consistency (all samples within 20% of mean distance)
+- Selects the sample with strongest RSSI as the representative point
+- This approach eliminates spurious readings from weak reflections
 - **Improved azimuth processing** matching ROS2 driver behavior
 - Handles scanning direction changes properly
 
@@ -149,6 +165,11 @@ This fixes the issue where angles appeared only in multiples of 82°. The resolu
 - This was a bug in the angle calculation that has been **fixed**
 - Run `./test_angle_calculation` to verify the fix
 - The angles should now be continuous and smooth
+
+**"Getting readings at 15m when blocking with hand"**
+- This is normal behavior - weak reflections from your hand
+- The improved filtering now rejects these (RSSI > 20-35 depending on mode)
+- Use `lidar_visualizer` for best filtering with multi-sample validation
 
 **Permission denied**
 - Run with `sudo` for UDP port access: `sudo ./lidar_reader`
