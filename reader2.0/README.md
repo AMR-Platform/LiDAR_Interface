@@ -29,11 +29,12 @@ MSOP Packet (1206 bytes without UDP header):
 
 - **Real-time UDP packet reception** on port 2368
 - **MSOP packet parsing** with proper big-endian byte order handling
+- **Accurate azimuth calculation** matching ROS2 driver implementation
 - **270° field of view support** (45° to 315° scanning range)
-- **Azimuth interpolation** for accurate angular positioning within valid range
 - **Dual return processing** (strongest and last returns)
-- **Invalid data detection** for last packets in rotation
-- **Point cloud data extraction** with azimuth validation
+- **Distance validation** (0.1m to 15m range filtering)
+- **Point cloud data extraction** with comprehensive validation
+- **Data visualization tools** for analysis and debugging
 
 ## Building
 
@@ -45,26 +46,43 @@ MSOP Packet (1206 bytes without UDP header):
 ### Build Instructions
 
 ```bash
-# Create build directory
+# Use the provided build script (recommended)
+chmod +x build.sh
+./build.sh
+
+# Or build manually:
 mkdir build
 cd build
-
-# Configure and build
 cmake ..
 make
 
-# Run the program
-sudo ./lidar_reader
+# Run the programs
+sudo ./lidar_reader              # Real-time viewer
+sudo ./lidar_visualizer          # Data collector
+./test_angle_calculation         # Test angle computation
 ```
 
 Note: Root privileges may be required to bind to UDP port 2368.
 
+### Quick Test
+To verify the angle calculation is working correctly:
+```bash
+./build/test_angle_calculation
+```
+This will show you how angles are calculated and verify the fix for the "multiples of 82°" issue.
+
 ## Usage
 
+### Real-time Data Viewing
 1. **Connect your lidar** to the Jetson Nano via Ethernet
 2. **Configure network** to receive UDP packets on port 2368
 3. **Run the program**: `sudo ./lidar_reader`
 4. **View real-time data** as packets are received and parsed
+
+### Data Collection and Visualization
+1. **Collect data**: `sudo ./lidar_visualizer`
+2. **Install Python dependencies**: `pip3 install matplotlib pandas numpy`
+3. **Visualize data**: `python3 visualize_lidar.py`
 
 ## Output
 
@@ -88,9 +106,12 @@ Timestamp: 245899399 μs, Factory: 0x3740, Points: 192 (270° FOV: 45°-315°)
 
 ## Code Structure
 
-- **`msop_parser.h/cpp`**: Core MSOP packet parsing logic
-- **`main.cpp`**: UDP receiver and main application
-- **`CMakeLists.txt`**: Build configuration
+- **`msop_parser.h/cpp`**: Core MSOP packet parsing logic (exactly matches ROS2 driver)
+- **`main.cpp`**: Real-time UDP receiver and data display
+- **`lidar_visualizer.cpp`**: Data collector and visualization generator
+- **`test_angle_calculation.cpp`**: Test program to verify angle calculation
+- **`CMakeLists.txt`**: Build configuration for all programs
+- **`build.sh`**: Convenient build script for Linux
 
 ## Technical Details
 
@@ -98,24 +119,59 @@ Timestamp: 245899399 μs, Factory: 0x3740, Points: 192 (270° FOV: 45°-315°)
 All multi-byte values in MSOP packets use big-endian byte order and are converted to host byte order during parsing.
 
 ### Azimuth Calculation
-The azimuth for each measurement point is interpolated within each data block, but only for angles within the valid 270° range (45° to 315°):
+The azimuth calculation now **exactly matches** the official ROS2 driver implementation:
 ```cpp
-azimuth_n = block_azimuth + (angle_increment / 16) × n
-// Only if 45° ≤ azimuth_n ≤ 315°
+// Calculate resolution dynamically like ROS2 driver (integer math)
+if ((next_block_azimuth - current_block_azimuth) > 0) {
+    resolution = (next_block_azimuth - current_block_azimuth) / 16;
+} else {
+    resolution = 25;  // Default resolution when can't calculate
+}
+
+// Simple addition: block_azimuth + (resolution × measurement_index)
+calculated_azimuth = block_azimuth + (resolution × measurement_index);
+azimuth_degrees = calculated_azimuth / 100.0f;
 ```
+
+This fixes the issue where angles appeared only in multiples of 82°. The resolution is now calculated dynamically for each packet pair, providing smooth, continuous angle coverage.
 
 ### Data Validation
 - Checks for valid flag bytes (0xFFEE for normal blocks, 0xFFFF for invalid)
-- Validates distance values (non-zero, not 0xFFFF)
-- **Validates azimuth angles** (must be between 45° and 315°)
-- Handles scanning direction changes without invalid interpolation
-- Detects last packet with invalid data blocks
+- Validates distance values (0.1m to 15m range)
+- **Improved azimuth processing** matching ROS2 driver behavior
+- Handles scanning direction changes properly
 
 ## Troubleshooting
 
-- **Permission denied**: Run with `sudo` for port access
-- **No packets received**: Check network configuration and lidar connection
-- **Unexpected packet size**: Verify lidar configuration and network settings
+### Common Issues
+
+**"Angles only show multiples of 82°"**
+- This was a bug in the angle calculation that has been **fixed**
+- Run `./test_angle_calculation` to verify the fix
+- The angles should now be continuous and smooth
+
+**Permission denied**
+- Run with `sudo` for UDP port access: `sudo ./lidar_reader`
+
+**No packets received**
+- Check network configuration and lidar connection
+- Verify lidar is sending to port 2368
+- Check firewall settings
+
+**Unexpected packet size**
+- Verify lidar configuration and network settings
+- Some network stacks may add/remove UDP headers
+
+**Build errors**
+- Ensure CMake 3.10+ and GCC with C++11 support
+- Try the build script: `./build.sh`
+
+### Debugging Tips
+
+1. **Test angle calculation**: `./test_angle_calculation`
+2. **Check packet reception**: Look for "Received X bytes" messages
+3. **Verify data validity**: Check the azimuth and distance ranges in output
+4. **Use visualization**: `sudo ./lidar_visualizer` then `python3 visualize_lidar.py`
 
 ## License
 

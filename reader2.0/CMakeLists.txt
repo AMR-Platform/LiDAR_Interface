@@ -15,14 +15,34 @@ find_package(Threads REQUIRED)
 # Include directories
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-# Create the executable
+# Create the main executable
 add_executable(lidar_reader
     main.cpp
     msop_parser.cpp
 )
 
-# Link libraries
+# Create the data collector/visualizer executable
+add_executable(lidar_visualizer
+    lidar_visualizer.cpp
+    msop_parser.cpp
+)
+
+# Create the angle calculation test executable
+add_executable(test_angle_calculation
+    test_angle_calculation.cpp
+    msop_parser.cpp
+)
+
+# Link libraries for all executables
 target_link_libraries(lidar_reader
+    ${CMAKE_THREAD_LIBS_INIT}
+)
+
+target_link_libraries(lidar_visualizer
+    ${CMAKE_THREAD_LIBS_INIT}
+)
+
+target_link_libraries(test_angle_calculation
     ${CMAKE_THREAD_LIBS_INIT}
 )
 

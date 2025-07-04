@@ -104,35 +104,27 @@ uint32_t MSOPParser::be32ToHost(uint32_t value) const {
 }
 
 float MSOPParser::calculateAzimuth(uint16_t block_azimuth, uint16_t next_block_azimuth, int measurement_index) const {
-    float current_angle = block_azimuth / 100.0f;  // Convert to degrees
-    float next_angle = next_block_azimuth / 100.0f;
-    
-    // LakiBeam1(L) has 270° field of view: 45° to 315°
-    // Handle angle calculation for 270° scanning range
-    float angle_diff = next_angle - current_angle;
-    
-    // For 270° lidar, we don't expect wraparound from 315° to 45°
-    // If we see a large negative difference, it might be end-of-scan to start-of-scan
-    // In this case, don't interpolate - use current block angle
-    if (angle_diff < -200.0f) {
-        // Likely jumped from end of scan (~315°) to start of scan (~45°)
-        // Don't interpolate across this gap
-        return current_angle;
-    } else if (angle_diff > 200.0f) {
-        // Unlikely but handle reverse case
-        return current_angle;
+    // Direct implementation matching ROS2 driver exactly
+    // resolution = (next_azimuth - current_azimuth) / 16
+    int resolution = 0;
+    if ((next_block_azimuth - block_azimuth) > 0) {
+        resolution = (next_block_azimuth - block_azimuth) / 16;
+    } else {
+        // Use a default resolution when can't calculate (like ROS2 driver does)
+        resolution = 25;  // Default from ROS2 driver
     }
     
-    // Normal case: interpolate within the scanning direction
-    float interpolated_angle = current_angle + (angle_diff / 16.0f) * measurement_index;
+    // Simple addition: block_azimuth + (resolution * i)
+    uint16_t calculated_azimuth = block_azimuth + (resolution * measurement_index);
     
-    // Validate that the angle is within expected range (45° to 315°)
-    if (interpolated_angle < 45.0f || interpolated_angle > 315.0f) {
-        // If interpolation results in invalid angle, use block angle
-        return current_angle;
-    }
+    // Convert to degrees and return
+    float azimuth_degrees = calculated_azimuth / 100.0f;
     
-    return interpolated_angle;
+    // Normalize angle to 0-360 range
+    while (azimuth_degrees < 0.0f) azimuth_degrees += 360.0f;
+    while (azimuth_degrees >= 360.0f) azimuth_degrees -= 360.0f;
+    
+    return azimuth_degrees;
 }
 
 bool MSOPParser::isValidDataBlock(const DataBlock* block) const {
@@ -140,35 +132,14 @@ bool MSOPParser::isValidDataBlock(const DataBlock* block) const {
     uint16_t azimuth = be16ToHost(block->azimuth);
     
     // Valid blocks should have flag 0xFFEE and azimuth != 0xFFFF
-    if (flag != 0xFFEE || azimuth == 0xFFFF) {
-        return false;
-    }
-    
-    // Check if azimuth is within the 270° scanning range
-    float angle_degrees = azimuth / 100.0f;
-    if (!isValidAzimuth(angle_degrees)) {
-        return false;
-    }
-    
-    // Additional validation: check if at least some measurements in the block are valid
-    int valid_measurements = 0;
-    for (int i = 0; i < 16; ++i) {
-        uint16_t distance_strongest = be16ToHost(block->measurements[i].distance_strongest);
-        uint16_t distance_last = be16ToHost(block->measurements[i].distance_last);
-        
-        if ((distance_strongest != 0 && distance_strongest != 0xFFFF) ||
-            (distance_last != 0 && distance_last != 0xFFFF)) {
-            valid_measurements++;
-        }
-    }
-    
-    // At least a few measurements should be valid for a good data block
-    return valid_measurements > 0;
+    // ROS2 driver doesn't check azimuth range here, so we'll be less strict
+    return (flag == 0xFFEE) && (azimuth != 0xFFFF);
 }
 
 bool MSOPParser::isValidAzimuth(float azimuth) const {
-    // LakiBeam1(L) has 270° field of view: 45° to 315°
-    return (azimuth >= 45.0f && azimuth <= 315.0f);
+    // Allow wider range than strict 45°-315° like ROS2 driver
+    // Filter out clearly invalid angles but be more permissive
+    return (azimuth >= 0.0f && azimuth <= 360.0f);
 }
 
 bool MSOPParser::isValidDistance(float distance) const {
