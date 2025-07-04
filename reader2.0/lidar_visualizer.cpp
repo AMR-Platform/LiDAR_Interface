@@ -157,12 +157,12 @@ plt.tight_layout()
 # Print statistics
 print(f"Total points: {len(df)}")
 print(f"Distance range: {df['distance'].min():.2f} - {df['distance'].max():.2f} m")
-print(f"Azimuth range: {df['azimuth'].min():.1f} - {df['azimuth'].max():.1f}°")
+print(f"Azimuth range: {df['azimuth'].min():.1f} - {df['azimuth'].max():.1f} degrees")
 print(f"RSSI range: {df['rssi'].min()} - {df['rssi'].max()}")
 
 # Show valid field of view
 valid_270_points = df[(df['azimuth'] >= 45) & (df['azimuth'] <= 315)]
-print(f"Points in 270° FOV (45°-315°): {len(valid_270_points)} ({len(valid_270_points)/len(df)*100:.1f}%)")
+print(f"Points in 270 degree FOV (45-315): {len(valid_270_points)} ({len(valid_270_points)/len(df)*100:.1f}%)")
 
 plt.show()
 
