@@ -99,77 +99,71 @@ public:
         std::string py_filename = "visualize_lidar.py";
         std::ofstream py_file(py_filename);
         
-        py_file << R"(#!/usr/bin/env python3
-import pandas as pd
-import matplotlib.pyplot as plt
-import numpy as np
-from matplotlib.colors import LinearSegmentedColormap
-
-# Read the CSV file
-df = pd.read_csv(')" << csv_filename << R"(')
-
-# Create figure with subplots
-fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(15, 12))
-
-# 1. Polar plot (like traditional lidar view)
-ax1.set_title('Lidar Data - Polar View')
-scatter1 = ax1.scatter(df['azimuth'], df['distance'], 
-                      c=df['rssi'], cmap='viridis', s=1, alpha=0.7)
-ax1.set_xlabel('Azimuth (degrees)')
-ax1.set_ylabel('Distance (meters)')
-ax1.set_xlim(0, 360)
-ax1.set_ylim(0, 15)
-ax1.grid(True, alpha=0.3)
-plt.colorbar(scatter1, ax=ax1, label='RSSI')
-
-# 2. Cartesian plot (top-down view)
-ax2.set_title('Lidar Data - Top-Down View')
-scatter2 = ax2.scatter(df['x'], df['y'], 
-                      c=df['rssi'], cmap='plasma', s=1, alpha=0.7)
-ax2.set_xlabel('X (meters)')
-ax2.set_ylabel('Y (meters)')
-ax2.set_aspect('equal')
-ax2.grid(True, alpha=0.3)
-plt.colorbar(scatter2, ax=ax2, label='RSSI')
-
-# 3. Distance histogram
-ax3.set_title('Distance Distribution')
-ax3.hist(df['distance'], bins=50, alpha=0.7, color='skyblue', edgecolor='black')
-ax3.set_xlabel('Distance (meters)')
-ax3.set_ylabel('Count')
-ax3.grid(True, alpha=0.3)
-
-# 4. Azimuth vs Distance heatmap
-ax4.set_title('Azimuth vs Distance Density')
-# Create 2D histogram
-azimuth_bins = np.linspace(0, 360, 73)  # 5-degree bins
-distance_bins = np.linspace(0, 15, 31)  # 0.5-meter bins
-H, xedges, yedges = np.histogram2d(df['azimuth'], df['distance'], 
-                                  bins=[azimuth_bins, distance_bins])
-X, Y = np.meshgrid(xedges, yedges)
-im = ax4.pcolormesh(X, Y, H.T, cmap='hot')
-ax4.set_xlabel('Azimuth (degrees)')
-ax4.set_ylabel('Distance (meters)')
-plt.colorbar(im, ax=ax4, label='Point Density')
-
-plt.tight_layout()
-
-# Print statistics
-print(f"Total points: {len(df)}")
-print(f"Distance range: {df['distance'].min():.2f} - {df['distance'].max():.2f} m")
-print(f"Azimuth range: {df['azimuth'].min():.1f} - {df['azimuth'].max():.1f} degrees")
-print(f"RSSI range: {df['rssi'].min()} - {df['rssi'].max()}")
-
-# Show valid field of view
-valid_270_points = df[(df['azimuth'] >= 45) & (df['azimuth'] <= 315)]
-print(f"Points in 270 degree FOV (45-315): {len(valid_270_points)} ({len(valid_270_points)/len(df)*100:.1f}%)")
-
-plt.show()
-
-# Save the plot
-plt.savefig('lidar_visualization.png', dpi=300, bbox_inches='tight')
-print("Visualization saved as 'lidar_visualization.png'")
-)";
+        py_file << "#!/usr/bin/env python3\n";
+        py_file << "import pandas as pd\n";
+        py_file << "import matplotlib.pyplot as plt\n";
+        py_file << "import numpy as np\n";
+        py_file << "from matplotlib.colors import LinearSegmentedColormap\n\n";
+        
+        py_file << "# Read the CSV file\n";
+        py_file << "df = pd.read_csv('" << csv_filename << "')\n\n";
+        
+        py_file << "# Create figure with subplots\n";
+        py_file << "fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(15, 12))\n\n";
+        
+        py_file << "# 1. Polar plot (like traditional lidar view)\n";
+        py_file << "ax1.set_title('Lidar Data - Polar View')\n";
+        py_file << "scatter1 = ax1.scatter(df['azimuth'], df['distance'], c=df['rssi'], cmap='viridis', s=1, alpha=0.7)\n";
+        py_file << "ax1.set_xlabel('Azimuth (degrees)')\n";
+        py_file << "ax1.set_ylabel('Distance (meters)')\n";
+        py_file << "ax1.set_xlim(0, 360)\n";
+        py_file << "ax1.set_ylim(0, 15)\n";
+        py_file << "ax1.grid(True, alpha=0.3)\n";
+        py_file << "plt.colorbar(scatter1, ax=ax1, label='RSSI')\n\n";
+        
+        py_file << "# 2. Cartesian plot (top-down view)\n";
+        py_file << "ax2.set_title('Lidar Data - Top-Down View')\n";
+        py_file << "scatter2 = ax2.scatter(df['x'], df['y'], c=df['rssi'], cmap='plasma', s=1, alpha=0.7)\n";
+        py_file << "ax2.set_xlabel('X (meters)')\n";
+        py_file << "ax2.set_ylabel('Y (meters)')\n";
+        py_file << "ax2.set_aspect('equal')\n";
+        py_file << "ax2.grid(True, alpha=0.3)\n";
+        py_file << "plt.colorbar(scatter2, ax=ax2, label='RSSI')\n\n";
+        
+        py_file << "# 3. Distance histogram\n";
+        py_file << "ax3.set_title('Distance Distribution')\n";
+        py_file << "ax3.hist(df['distance'], bins=50, alpha=0.7, color='skyblue', edgecolor='black')\n";
+        py_file << "ax3.set_xlabel('Distance (meters)')\n";
+        py_file << "ax3.set_ylabel('Count')\n";
+        py_file << "ax3.grid(True, alpha=0.3)\n\n";
+        
+        py_file << "# 4. Azimuth vs Distance heatmap\n";
+        py_file << "ax4.set_title('Azimuth vs Distance Density')\n";
+        py_file << "azimuth_bins = np.linspace(0, 360, 73)  # 5-degree bins\n";
+        py_file << "distance_bins = np.linspace(0, 15, 31)  # 0.5-meter bins\n";
+        py_file << "H, xedges, yedges = np.histogram2d(df['azimuth'], df['distance'], bins=[azimuth_bins, distance_bins])\n";
+        py_file << "X, Y = np.meshgrid(xedges, yedges)\n";
+        py_file << "im = ax4.pcolormesh(X, Y, H.T, cmap='hot')\n";
+        py_file << "ax4.set_xlabel('Azimuth (degrees)')\n";
+        py_file << "ax4.set_ylabel('Distance (meters)')\n";
+        py_file << "plt.colorbar(im, ax=ax4, label='Point Density')\n\n";
+        
+        py_file << "plt.tight_layout()\n\n";
+        
+        py_file << "# Print statistics\n";
+        py_file << "print(f\"Total points: {len(df)}\")\n";
+        py_file << "print(f\"Distance range: {df['distance'].min():.2f} - {df['distance'].max():.2f} m\")\n";
+        py_file << "print(f\"Azimuth range: {df['azimuth'].min():.1f} - {df['azimuth'].max():.1f} degrees\")\n";
+        py_file << "print(f\"RSSI range: {df['rssi'].min()} - {df['rssi'].max()}\")\n\n";
+        
+        py_file << "# Show valid field of view\n";
+        py_file << "valid_270_points = df[(df['azimuth'] >= 45) & (df['azimuth'] <= 315)]\n";
+        py_file << "print(f\"Points in 270 degree FOV (45-315): {len(valid_270_points)} ({len(valid_270_points)/len(df)*100:.1f}%)\")\n\n";
+        
+        py_file << "plt.show()\n\n";
+        py_file << "# Save the plot\n";
+        py_file << "plt.savefig('lidar_visualization.png', dpi=300, bbox_inches='tight')\n";
+        py_file << "print('Visualization saved as lidar_visualization.png')\n";
         
         py_file.close();
         std::cout << "Generated Python visualizer: " << py_filename << std::endl;
