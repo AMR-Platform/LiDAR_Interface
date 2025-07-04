@@ -1,0 +1,6 @@
+C:/Repositories/LiDAR_Interface/build/CMakeFiles/lidar_reader.dir
+C:/Repositories/LiDAR_Interface/build/CMakeFiles/main_app.dir
+C:/Repositories/LiDAR_Interface/build/CMakeFiles/read_packets.dir
+C:/Repositories/LiDAR_Interface/build/CMakeFiles/test_full_scan.dir
+C:/Repositories/LiDAR_Interface/build/CMakeFiles/ALL_BUILD.dir
+C:/Repositories/LiDAR_Interface/build/CMakeFiles/ZERO_CHECK.dir
