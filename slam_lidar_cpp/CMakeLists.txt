@@ -30,3 +30,7 @@ target_link_libraries(test_full_scan
   lidar_reader
 )
 
+add_executable(dump_msop src/dump_msop.cpp)
+# no extra libs needed
+
+
